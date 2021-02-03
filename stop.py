@@ -2,13 +2,14 @@
 """
 Sends stop message to boomer_base
 """
-from ctrl_messaging_routines import *
+from ctrl_messaging_routines import send_msg, is_active
+from control_ipc_defines import PUT_METHOD, STOP_RSRC
 import logging
 import sys
 
 if __name__ == '__main__':
    # start and check for active
-   rc, code = send_msg(PUT, STOP)
+   rc, code = send_msg(PUT_METHOD, STOP_RSRC)
    if not rc:
       logging.error("PUT STOP failed, code: {}".format(code))
       sys.exit(1)

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
-from ctrl_messaging_routines import *
-import message_pb2 as mpb
+from ctrl_messaging_routines import send_msg, is_active
+from control_ipc_defines import GAME_MODE_E, DRILL_MODE_E, \
+   MODE_RSRC, STAT_RSRC, STRT_RSRC, STOP_RSRC, \
+   GET_METHOD, PUT_METHOD
 import logging
 import sys
 
@@ -10,23 +12,25 @@ logger = logging.getLogger(__name__)
 log_format = ('[%(asctime)s] %(levelname)-6s %(message)s')
 
 logging.basicConfig(
-    # level=logging.DEBUG,
-    level=logging.INFO,
+    level=logging.DEBUG,
+    # level=logging.INFO,
     format=log_format,
     # filename=('debug.log'),
 )
 
-# logging.info("status: {}".format(send_msg(GET, STATUS)))
+# logging.info("status: {}".format(send_msg(GET_METHOD, STATUS)))
 
-mode_default = {'mode': 1, 'drill_workout_id': 0, 'drill_step': 0} #, 'iterations': 0}
+# mode_default = {'mode': 1, 'drill_workout_id': 0, 'drill_step': 0} #, 'iterations': 0}
+mode_default = {'mode': 1, 'id': 0, 'step': 0, 'doubles': 0, 'tiebreaker': 0}
 params_default = {'level': 2, 'speed': 100, 'height': 0, 'delay': 0}
+cam_test = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':5, 'g':7, 'h':8, 'i':9, 'j':10, 'k':11, 'l':12, 'm':13, 'n':1014}
 
 def run_tests():
    # print("Game test result: {}\n".format(test_game(doubles=False, tie_breaker=True)))
    # print("Game test result: {}\n".format(test_game(doubles=True, tie_breaker=False)))
    print("Drill test result: {}\n".format(test_drill(drill_id=39)))
-   # print("Mode test result: {}\n".format(test_register(MODE, mode_default)))
-   # print("Params test result: {}\n".format(test_register(PARAMS, params_default)))
+   # print("Mode test result: {}\n".format(test_register(RSRC_MODE, mode_default)))
+   # print("Params test result: {}\n".format(test_register(RSRS_LDSH, params_default)))
 
 
 def test_game(doubles=False, tie_breaker=False):
@@ -42,14 +46,14 @@ def test_game(doubles=False, tie_breaker=False):
    int_doubles = int(doubles == True)
    int_tiebreaker = int(tie_breaker == True)
 
-   mode = {'mode': mpb.GAME, 'doubles': int_doubles, 'tie_breaker': int_tiebreaker}
-   rc, code = send_msg(PUT, MODE, mode)
+   mode = {'mode': GAME_MODE_E, 'doubles': int_doubles, 'tie_breaker': int_tiebreaker}
+   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
    if not rc:
       logging.error("test_game: initial PUT mode failed, code: {}".format(code))
       return False
 
    # start and check for active
-   rc, code = send_msg(PUT, START)
+   rc, code = send_msg(PUT_METHOD, STRT_RSRC)
    if not rc:
       logging.error("test_game: PUT START failed, code: {}".format(code))
       return False
@@ -61,7 +65,7 @@ def test_game(doubles=False, tie_breaker=False):
       test_rc = False
 
    # stop and check for inactive
-   rc, code = send_msg(PUT, STOP)
+   rc, code = send_msg(PUT_METHOD, STOP_RSRC)
    if not rc:
       logging.error("test_game: PUT STOP failed, code: {}".format(code))
       return False
@@ -73,21 +77,19 @@ def test_game(doubles=False, tie_breaker=False):
       test_rc = False
 
    # check mode for doubles, tieb_break
-   rc, register = send_msg(GET, MODE)
+   rc, register = send_msg(GET_METHOD, MODE_RSRC)
    if not rc:
       logging.error("test_game: final GET mode failed")
       return False
    if (register is not None):
-      if register['mode'] != mpb.GAME:
-         logging.error("test_game: mode check failed, expected: {}, got {}:".format(mpb.GAME, register['mode']))
+      if register['mode'] != str(GAME_MODE_E):
+         logging.error("test_game: mode check failed, expected: {}, got {}:".format(GAME_MODE_E, register['mode']))
          test_rc = False
-      if ( (('doubles' not in register) and doubles) or \
-           (('doubles' in register) and (register['doubles'] != int_doubles))):
-         logging.error("test_game: mode check failed, expected: {}, got {}:".format(int_doubles, register['doubles']))
+      if (('doubles' in register) and (register['doubles'] != str(int_doubles))):
+         logging.error("test_game: doubles check failed, expected: {}, got {}:".format(int_doubles, register['doubles']))
          test_rc = False
-      if ( (('tie_breaker' not in register) and tie_breaker) or \
-           (('tie_breaker' in register) and (register['tie_breaker'] != int_tiebreaker))):
-         logging.error("test_game: mode check failed, expected: {}, got {}:".format(int_tiebreaker, register['tie_breaker']))
+      if (('tie_breaker' in register) and (register['tie_breaker'] != str(int_tiebreaker))):
+         logging.error("test_game: tiebreaker check failed, expected: {}, got {}:".format(int_tiebreaker, register['tie_breaker']))
          test_rc = False
    
    return test_rc
@@ -102,14 +104,14 @@ def test_drill(drill_id=39):
       print("Base is already active")
       return False
 
-   mode = {'mode': mpb.DRILL, 'drill_workout_id': drill_id}
-   rc, code = send_msg(PUT, MODE, mode)
+   mode = {'mode': DRILL_MODE_E, 'id': drill_id}
+   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
    if not rc:
       logging.error("test_drill: initial PUT mode failed, code: {}".format(code))
       return False
 
    # start and check for active
-   rc, code = send_msg(PUT, START)
+   rc, code = send_msg(PUT_METHOD, STRT_RSRC)
    if not rc:
       logging.error("test_drill: PUT START failed, code: {}".format(code))
       return False
@@ -121,9 +123,9 @@ def test_drill(drill_id=39):
       test_rc = False
 
    # stop and check for inactive
-   rc, code = send_msg(PUT, STOP)
+   rc, code = send_msg(PUT_METHOD, STOP_RSRC)
    if not rc:
-      logging.error("test_game: PUT STOP failed, code: {}".format(code))
+      logging.error("test drill: PUT STOP failed, code: {}".format(code))
       return False
    active = is_active()
    if (type(active) is not bool):
@@ -135,16 +137,15 @@ def test_drill(drill_id=39):
    return test_rc
 
 
-
 def test_register(register_under_test, default_values):
     test_pattern = {}
     read_back_compare = True
-    msg_ok, register_original = send_msg(GET, register_under_test)
+    msg_ok, register_original = send_msg(GET_METHOD, register_under_test)
     if not msg_ok:
         logging.error("GET {} failed.".format(register_under_test))
         return False
-    if len(register_original) == 0:
-        register_original = default_values
+   #  if len(register_original) == 0:
+   #      register_original = default_values
     full_dict = default_values
     logging.debug("register before test: {}".format(register_original))
     for i in range(len(full_dict)):
@@ -156,10 +157,10 @@ def test_register(register_under_test, default_values):
                 test_pattern[key] = 2
             j += 1
         logging.debug("Setting {} to: {}".format(register_under_test, test_pattern))
-        if send_msg(PUT, register_under_test, test_pattern) == False:
+        if send_msg(PUT_METHOD, register_under_test, test_pattern) == False:
             logging.error("PUT {} failed".format(register_under_test))
             break
-        msg_ok, reg_read_back = send_msg(GET, register_under_test)
+        msg_ok, reg_read_back = send_msg(GET_METHOD, register_under_test)
         if not msg_ok:
             logging.error("GET {} failed.".format(register_under_test))
             return False
@@ -171,7 +172,7 @@ def test_register(register_under_test, default_values):
         if not read_back_compare:
             break
     #restore 
-    if (send_msg(PUT, register_under_test, register_original) == False):
+    if (send_msg(PUT_METHOD, register_under_test, register_original) == False):
         logging.error("restore {} failed".format(register_under_test))
     logging.info("Register test done: {} restored to: {}".format(register_under_test, register_original))
     return(read_back_compare)

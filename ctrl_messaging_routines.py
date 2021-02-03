@@ -1,5 +1,5 @@
 
-__all__ = ["send_msg", "is_active", "GET", "PUT", "STATUS", "MODE", "PARAMS", "START", "STOP"]
+__all__ = ["send_msg", "is_active"]
 
 import os as _os
 from sys import platform as _platform
@@ -7,34 +7,26 @@ import errno as _errno
 from select import select as _select
 import logging
 
-from protobuf_to_dict import protobuf_to_dict, dict_to_protobuf
-
-from message_pb2 import b_status_msg as _b_status_msg
-from message_pb2 import b_mode_msg as _b_mode_msg
-from message_pb2 import b_params_msg as _b_params_msg
+from control_ipc_defines import RSRC_OFFSET, GET_METHOD, PUT_METHOD, RSP_METHOD, STAT_RSRC, \
+   RESP_OK, MAX_MESSAGE_SIZE, HEADER_LENGTH
 
 _logger = logging.getLogger(__name__)
 # log_format = ('[%(asctime)s] %(levelname)-6s %(name)-12s %(message)s')
 _log_format = ('[%(asctime)s] %(levelname)-6s %(message)s')
 
 logging.basicConfig(
-   level=logging.DEBUG,
+   # level=logging.DEBUG,
+   level=logging.INFO,
    format=_log_format,
    # filename=('debug.log'),
 )
 
-_BIPC_HEADER_LENGTH = 15
-_MAX_BYTES_TO_READ = 80
+# _HEADER_LENGTH = 8
+_RESP_CODE_START = RSRC_OFFSET + 1
+# _MAX_BYTES_TO_READ = 80
 
-GET = "GET"
-PUT = "PUT"
-STATUS = "STATU"
-MODE = "MODE_"
-PARAMS = "PARMS"
-START = "START"
-STOP = "STOP_"
-
-_OK = bytearray("BIPC 200 ", 'utf-8')
+# _OK = bytearray("RSP  200", 'utf-8')
+_OK = bytearray(RSP_METHOD + "  " + str(RESP_OK), 'utf-8')
 
 if 'darwin' in _platform:
    _FIFO_BASE_TO_CTRL = "/tmp/BaseToCtrl.fifo"
@@ -69,6 +61,29 @@ def init(read_fifo=_FIFO_BASE_TO_CTRL, write_fifo=_FIFO_CTRL_TO_BASE):
    _fd_read = _os.open(read_fifo, _os.O_RDONLY)
    logging.debug("{} opened.".format(read_fifo))
 
+def string_to_dict(a_str):
+   dict_out = {}
+   kv_list = a_str.split(',')
+   for kv in kv_list: 
+      pair = kv.split(':')
+      dict_out[pair[0]] = pair[1]
+   return dict_out
+
+def dict_to_bytes(a_dict):
+   ret_str = ""
+   a_dict_len = len(a_dict)
+   i = 0
+   for k, v in a_dict.items():
+      ret_str += k + ":"
+      if type(v) != str:
+         ret_str += str(v)
+      else:
+         ret_str += v
+      if i < a_dict_len-1:
+         ret_str += ","
+      i += 1
+   return str.encode(ret_str)
+
 
 def empty_pipe():
    global _non_empty_pipe_count
@@ -80,13 +95,13 @@ def empty_pipe():
       fd_r, _, _ = _select([_fd_read], [], [], 0)
       if _fd_read in fd_r:
             print("read pipe before sending msg: {}".format(
-               _os.read(_fd_read, _MAX_BYTES_TO_READ)))
+               _os.read(_fd_read, MAX_MESSAGE_SIZE)))
             _non_empty_pipe_count += 1
       else:
             pipe_empty = True
 
 
-def send_msg(method=GET, resource=STATUS, settings={}):
+def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}):
    global _fd_read
    global _fd_write
    msg = None
@@ -94,60 +109,34 @@ def send_msg(method=GET, resource=STATUS, settings={}):
    if _fd_write is None:
       init()
 
-   rcvd_encoded_msg = None
-   send_encoded_msg = None
-   if (method is GET):
-      header_bytes = str.encode("BIPC " + GET + " " + resource + " ")
-      if (resource is STATUS):
-         rcvd_encoded_msg = _b_status_msg()
-      elif (resource is MODE):
-         rcvd_encoded_msg = _b_mode_msg()
-      elif (resource is PARAMS):
-         rcvd_encoded_msg = _b_params_msg()
-      else:
-         logging.error("{} {} not supported".format(GET, resource))
-   elif (method is PUT):
-      header_bytes = str.encode("BIPC PUT " + resource + " ")
-      if (resource is MODE):
-         send_encoded_msg = dict_to_protobuf(
-               _b_mode_msg, values=settings).SerializeToString()
-      elif (resource is PARAMS):
-         send_encoded_msg = dict_to_protobuf(
-               _b_params_msg, values=settings).SerializeToString()
+   send_encoded_msg = b''
+   header_bytes = str.encode(method + " " + resource + " ")
+   if (method is PUT_METHOD):
+      send_encoded_msg = dict_to_bytes(settings)
 
-   if (rcvd_encoded_msg is not None or method is PUT):
-      if (send_encoded_msg is not None):
-         bytes_written = _os.write(_fd_write, header_bytes + send_encoded_msg)
-      else:
-         bytes_written = _os.write(_fd_write, header_bytes)
+   # print("header type: {} -- msg type: {}".format(type(header_bytes), type(send_encoded_msg)))
+   bytes_written = _os.write(_fd_write, header_bytes + send_encoded_msg)
 
-      if bytes_written < 1:
-         logging.debug("FIFO write failed; read end closed?")
-      else:
-         logging.debug("Wrote {}".format(header_bytes))
+   if bytes_written < 1:
+      logging.debug("FIFO write failed; read end closed?")
+   else:
+      logging.debug("Wrote {} {}".format(header_bytes, send_encoded_msg))
 
-      data = _os.read(_fd_read, _MAX_BYTES_TO_READ)
-      if len(data) == 0:
-         logging.debug("FIFO read failed; write end closed?")
+   data = _os.read(_fd_read, MAX_MESSAGE_SIZE)
+   if len(data) == 0:
+      logging.debug("FIFO read failed; write end closed?")
+   else:
+      logging.debug("Read: {}{}".format(data[0:HEADER_LENGTH], data[HEADER_LENGTH:]))
+      code = data[_RESP_CODE_START:HEADER_LENGTH]
+      if data.startswith(_OK):
+         rc = True
+         if len(data) > HEADER_LENGTH:
+            msg = string_to_dict(data[HEADER_LENGTH:].decode("utf-8"))
       else:
-         logging.debug("Read: Header: {}   Body: {}".format(
-               data[0:14], data[_BIPC_HEADER_LENGTH:]))
-         code = data[5:8]
-         if data.startswith(_OK):
-               rc = True
-               if len(data) > _BIPC_HEADER_LENGTH:
-                  bytes_parsed = rcvd_encoded_msg.ParseFromString(
-                     data[_BIPC_HEADER_LENGTH:])
-                  if (bytes_parsed != len(data)-_BIPC_HEADER_LENGTH):
-                     logging.error("Message parse error: parsed: {} - should be {}".
-                                    format(bytes_parsed, len(data)-_BIPC_HEADER_LENGTH))
-                  else:
-                     msg = protobuf_to_dict(rcvd_encoded_msg)
-         else:
-               logging.error(
-                  "{} {} rejected - code: {}".format(method, resource, code))
-               
-   if (method is PUT):
+            logging.error(
+               "{} {} rejected - code: {}".format(method, resource, code))
+            
+   if (method is PUT_METHOD):
       return rc, code
    else:
       return rc, msg
@@ -159,7 +148,8 @@ def is_active():
       print("Error getting status")
       return "error"
    else:
-      if (status is not None) and ('active' in status) and (status['active'] == 1):
+      print("Status: {}".format(status))
+      if (status is not None) and ('active' in status) and (int(status['active']) == 1):
          return True
       else:
          return False

@@ -8,8 +8,8 @@ Does the following:
 
  returns 0 on pass; 1 on failure
 """
-from ctrl_messaging_routines import *
-# import message_pb2 as mpb
+from ctrl_messaging_routines import send_msg, is_active
+from control_ipc_defines import PUT_METHOD, STRT_RSRC, MODE_RSRC, LDSH_RSRC
 import argparse
 import logging
 import sys
@@ -60,10 +60,10 @@ if __name__ == '__main__':
 
 
    mode = {'mode': args.mode_setting, \
-      'drill_workout_id': args.drill_id_setting, \
+      'id': args.drill_id_setting, \
       'doubles': args.doubles_setting, \
-      'tie_breaker': args.tiebreaker_setting}
-   rc, code = send_msg(PUT, MODE, mode)
+      'tiebreak': args.tiebreaker_setting}
+   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
    if not rc:
       logging.error("PUT Mode failed, code: {}".format(code))
       sys.exit(1)
@@ -72,13 +72,13 @@ if __name__ == '__main__':
          'speed': args.speed_setting, \
          'height': args.height_setting, \
          'delay': args.delay_setting}
-   rc, code = send_msg(PUT, PARAMS, params)
+   rc, code = send_msg(PUT_METHOD, LDSH_RSRC, params)
    if not rc:
       logging.error("PUT PARAMS failed, code: {}".format(code))
       sys.exit(1)
 
    # start and check for active
-   rc, code = send_msg(PUT, START)
+   rc, code = send_msg(PUT_METHOD, STRT_RSRC)
    if not rc:
       logging.error("PUT START failed, code: {}".format(code))
       sys.exit(1)

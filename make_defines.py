@@ -19,7 +19,7 @@ if __name__ == '__main__':
   START_PATTERN = COMMENT_PATTERN + "start"
   STOP_PATTERN = COMMENT_PATTERN + "end"
   DEFINE_PATTERN = "#define "
-  OUTPUT_FILE = "control_ipc_defines_1.py"
+  OUTPUT_FILE = "control_ipc_defines.py"
 
   parser = argparse.ArgumentParser(description='Start boomer')
   parser.add_argument('-p', '--path', dest='h_file_dir', \
@@ -31,13 +31,14 @@ if __name__ == '__main__':
 
   in_defines_region = False
   out_file = open(OUTPUT_FILE, 'w')
-  define_files = ['ipc_control.h']
+  define_files = ['ipc_control.h', 'global_parameters.h']
  
   for define_file in define_files:
     with open(args.h_file_dir + define_file) as f: 
       for line in f:
         if line.startswith(START_PATTERN):
           in_defines_region = True
+          out_file.write("\n# defines from file: {}\n".format(define_file))
           continue
         if in_defines_region:
           if line.startswith(DEFINE_PATTERN):
@@ -54,4 +55,5 @@ if __name__ == '__main__':
             in_defines_region = False
             break
 
-  out_file.close() 
+  out_file.close()
+  print("generated: {}\n".format(OUTPUT_FILE))

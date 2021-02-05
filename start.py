@@ -14,7 +14,10 @@ from control_ipc_defines import PUT_METHOD, STRT_RSRC, MODE_RSRC, LDSH_RSRC, \
    LEVEL_MIN, LEVEL_MAX, LEVEL_DEFAULT, \
    DELAY_MIN, DELAY_MAX, DELAY_DEFAULT, \
    SPEED_MIN, SPEED_MAX, SPEED_DEFAULT, \
-   HEIGHT_MIN, HEIGHT_MAX, HEIGHT_DEFAULT
+   HEIGHT_MIN, HEIGHT_MAX, HEIGHT_DEFAULT, \
+   MODE_PARAM, ID_PARAM, STEP_PARAM, DOUBLES_PARAM, TIEBREAKER_PARAM, \
+   LEVEL_PARAM, SPEED_PARAM, DELAY_PARAM, HEIGHT_PARAM 
+
 import argparse
 import logging
 import sys
@@ -32,10 +35,10 @@ if __name__ == '__main__':
          type=int, choices=range(LEVEL_MIN, LEVEL_MAX+1), default=LEVEL_DEFAULT, nargs='?', \
          help='player skill level')
    parser.add_argument('-d', '--doubles', dest='doubles_setting', \
-         type=bool, default=False, nargs='?', \
+         type=int, choices=range(0, 2), default=0, nargs='?', \
          help='defaults to singles game mode')
    parser.add_argument('-t', '--tiebreaker', dest='tiebreaker_setting', \
-         type=bool, default=False, nargs='?', \
+         type=int, choices=range(0, 2), default=0, nargs='?', \
          help='defaults to regular game mode')
    parser.add_argument('-s', '--speed', dest='speed_setting', \
          type=int, choices=range(SPEED_MIN, SPEED_MAX+1), default=SPEED_DEFAULT, nargs='?', \
@@ -64,19 +67,19 @@ if __name__ == '__main__':
       sys.exit(1)
 
 
-   mode = {'mode': args.mode_setting, \
-      'id': args.drill_id_setting, \
-      'doubles': args.doubles_setting, \
-      'tiebreak': args.tiebreaker_setting}
+   mode = {MODE_PARAM: args.mode_setting, \
+      ID_PARAM: args.drill_id_setting, \
+      DOUBLES_PARAM: args.doubles_setting, \
+      TIEBREAKER_PARAM: args.tiebreaker_setting}
    rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
    if not rc:
       logging.error("PUT Mode failed, code: {}".format(code))
       sys.exit(1)
 
-   params = {'level': args.level_setting, \
-         'speed': args.speed_setting, \
-         'height': args.height_setting, \
-         'delay': args.delay_setting}
+   params = {LEVEL_PARAM: args.level_setting, \
+         SPEED_PARAM: args.speed_setting, \
+         HEIGHT_PARAM: args.height_setting, \
+         DELAY_PARAM: args.delay_setting}
    rc, code = send_msg(PUT_METHOD, LDSH_RSRC, params)
    if not rc:
       logging.error("PUT PARAMS failed, code: {}".format(code))

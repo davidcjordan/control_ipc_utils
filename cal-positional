@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+
+"""
+Does the following:
+ - sends in the calibration data
+
+ returns 0 on pass; 1 on failure
+"""
+from ctrl_messaging_routines import send_msg
+from control_ipc_defines import GET_METHOD, PUT_METHOD, STRT_RSRC, LCAM_RSRC, RCAM_RSRC
+
+import argparse
+import logging
+import sys
+
+#define NEAR_BASE_LEFT 0			// Near baseline, left singles sideline (bottom left corner of singles court)
+#define NEAR_BASE_RIGHT 1 
+#define NEAR_SERVICE_LEFT 2		// Near service line, left singles sideline
+#define NEAR_SERVICE_CENTER 3		//Near service line, center line (typically called the "T")
+#define NEAR_SERVICE_RIGHT 4
+#define FAR_BASE_LEFT 5				// Far baseline, left singles sideline (Upper left corner of singles court)
+#define FAR_BASE_RIGHT 6
+#define NET_LEFT     7
+#define NET_CENTER    8
+#define NET_RIGHT    9
+#define FAR_SERVICE_LEFT     10
+#define FAR_SERVICE_CENTER    11
+#define FAR_SERVICE_RIGHT    12
+
+
+if __name__ == '__main__':
+   shell_rc = 1
+
+   parser = argparse.ArgumentParser(description='set calibration points')
+   parser.add_argument('cam',type=int, default=0, help='camera number: 0 or 1')
+
+   parser.add_argument('a',type=float, help='NEAR_BASE_LEFT x')
+   parser.add_argument('b',type=float, help='NEAR_BASE_LEFT y')
+   parser.add_argument('c',type=float, help='NEAR_BASE_RIGHT x')
+   parser.add_argument('d',type=float, help='NEAR_BASE_RIGHT y')
+
+   parser.add_argument('e',type=float, help='NEAR_SERVICE_LEFT x')
+   parser.add_argument('f',type=float, help='NEAR_SERVICE_LEFT y')
+   parser.add_argument('g',type=float, help='NEAR_SERVICE_CENTER x')
+   parser.add_argument('h',type=float, help='NEAR_SERVICE_CENTER y')
+   parser.add_argument('i',type=float, help='NEAR_SERVICE_RIGHT x')
+   parser.add_argument('j',type=float, help='NEAR_SERVICE_RIGHT y')
+
+   parser.add_argument('k',type=float, help='FAR_BASE_LEFT x')
+   parser.add_argument('l',type=float, help='FAR_BASE_LEFT y')
+   parser.add_argument('m',type=float, help='FAR_BASE_RIGHT x')
+   parser.add_argument('n',type=float, help='FAR_BASE_RIGHT y')
+
+   parser.add_argument('o',type=float, help='NET_LEFT x')
+   parser.add_argument('p',type=float, help='NET_LEFT y')
+   parser.add_argument('q',type=float, help='NET_CENTER x')
+   parser.add_argument('r',type=float, help='NET_CENTER y')
+   parser.add_argument('s',type=float, help='NET_RIGHT x')
+   parser.add_argument('t',type=float, help='NET_RIGHT y')
+  
+   parser.add_argument('u',type=float, help='FAR_SERVICE_LEFT x')
+   parser.add_argument('v',type=float, help='FAR_SERVICE_LEFT y')
+   parser.add_argument('w',type=float, help='FAR_SERVICE_CENTER x')
+   parser.add_argument('x',type=float, help='FAR_SERVICE_CENTER y')
+   parser.add_argument('y',type=float, help='FAR_SERVICE_RIGHT x')
+   parser.add_argument('z',type=float, help='FAR_SERVICE_RIGHT y')
+   
+   args = parser.parse_args()
+   # print("called with {}: ".format(sys.argv[0]))
+
+   calib_data = {}
+   for arg in vars(args):
+      if arg is 'cam':
+         continue
+      else:
+         calib_data[arg] = getattr(args, arg)
+
+   if args.cam == 0:
+      cam_id = LCAM_RSRC
+   else:
+      cam_id = RCAM_RSRC
+
+   rc, code = send_msg(PUT_METHOD, cam_id, calib_data)
+   if not rc:
+      logging.error("PUT Mode failed, code: {}".format(code))
+      sys.exit(1)
+      
+'''
+   parser.add_argument('nblx',type=float, help='NEAR_BASE_LEFT x')
+   parser.add_argument('nbly',type=float, help='NEAR_BASE_LEFT y')
+   parser.add_argument('nbrx',type=float, help='NEAR_BASE_RIGHT x')
+   parser.add_argument('nbry',type=float, help='NEAR_BASE_RIGHT y')
+
+   parser.add_argument('nslx',type=float, help='NEAR_SERVICE_LEFT x')
+   parser.add_argument('nsly',type=float, help='NEAR_SERVICE_LEFT y')
+   parser.add_argument('nscx',type=float, help='NEAR_SERVICE_CENTER x')
+   parser.add_argument('nscy',type=float, help='NEAR_SERVICE_CENTER y')
+   parser.add_argument('nsrx',type=float, help='NEAR_SERVICE_RIGHT x')
+   parser.add_argument('nsry',type=float, help='NEAR_SERVICE_RIGHT y')
+
+   parser.add_argument('fblx',type=float, help='FAR_BASE_LEFT x')
+   parser.add_argument('fbly',type=float, help='FAR_BASE_LEFT y')
+   parser.add_argument('fbrx',type=float, help='FAR_BASE_RIGHT x')
+   parser.add_argument('fbry',type=float, help='FAR_BASE_RIGHT y')
+
+   parser.add_argument('nlx',type=float, help='NET_LEFT x')
+   parser.add_argument('nly',type=float, help='NET_LEFT y')
+   parser.add_argument('ncx',type=float, help='NET_CENTER x')
+   parser.add_argument('ncy',type=float, help='NET_CENTER y')
+   parser.add_argument('nrx',type=float, help='NET_RIGHT x')
+   parser.add_argument('nry',type=float, help='NET_RIGHT y')
+  
+   parser.add_argument('fslx',type=float, help='FAR_SERVICE_LEFT x')
+   parser.add_argument('fsly',type=float, help='FAR_SERVICE_LEFT y')
+   parser.add_argument('fscx',type=float, help='FAR_SERVICE_CENTER x')
+   parser.add_argument('fscy',type=float, help='FAR_SERVICE_CENTER y')
+   parser.add_argument('fsrx',type=float, help='FAR_SERVICE_RIGHT x')
+   parser.add_argument('fsry',type=float, help='FAR_SERVICE_RIGHT y')
+'''
+   
+'''
+   calib_data = { \
+      'a':args.nblx,'b':args.nbly,\
+      'c':args.nbrx,'d':args.nbry, \
+
+      'e':args.nslx,'f':args.nsly,\
+      'g':args.nscx,'h':args.nscy,\
+      'i':args.nsrx,'j':args.nsry,\
+
+      'k':args.fblx,'l':args.fbly,\
+      'm':args.fbrx,'n':args.fbry,\
+
+      'o':args.nlx,'p':args.nly,\
+      'q':args.ncx,'r':args.ncy,\
+      's':args.nrx,'t':args.nry}
+'''

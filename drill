@@ -14,7 +14,7 @@ from control_ipc_defines import PUT_METHOD, STRT_RSRC, MODE_RSRC, OPTS_RSRC, \
    DELAY_MIN, DELAY_MAX, DELAY_DEFAULT, \
    SPEED_MIN, SPEED_MAX, SPEED_DEFAULT, \
    HEIGHT_MIN, HEIGHT_MAX, HEIGHT_DEFAULT, \
-   MODE_PARAM, ID_PARAM, STEP_PARAM, TIEBREAKER_PARAM, \
+   MODE_PARAM, ID_PARAM, STEP_PARAM, DRILL_MODE_E, \
    LEVEL_PARAM, SPEED_PARAM, DELAY_PARAM, HEIGHT_PARAM 
 
 import argparse
@@ -25,16 +25,10 @@ if __name__ == '__main__':
    shell_rc = 1
 
    parser = argparse.ArgumentParser(description='Start boomer')
-   parser.add_argument('-m', '--mode', dest='mode_setting', \
-         type=int, choices=range(1, 4), default=1, nargs='?', \
-         )
    parser.add_argument('-l', '--level', dest='level_setting', \
          type=int, default=LEVEL_DEFAULT, nargs='?', \
          help='player skill level; range 10 to 70')
          # choices=range(LEVEL_MIN, LEVEL_MAX+1), <- removed because it enumerated the range
-   parser.add_argument('-t', '--tiebreaker', dest='tiebreaker_setting', \
-         type=int, choices=range(0, 2), default=0, nargs='?', \
-         help='defaults to game mode')
    parser.add_argument('-s', '--speed', dest='speed_setting', \
          type=int, default=SPEED_DEFAULT, nargs='?', \
          help='percent to increase/decrease ball speed: 80 to 100')
@@ -47,7 +41,7 @@ if __name__ == '__main__':
          type=int, default=DELAY_DEFAULT, nargs='?', \
          help='milliseoncds of delay the next ball; range -2000 to 2000')
          # choices=range(DELAY_MIN, DELAY_MAX+1), 
-   parser.add_argument('-n', '--drill_id', dest='drill_id_setting', \
+   parser.add_argument('-i', '--drill_id', dest='drill_id_setting', \
          type=int,  default=0, nargs='?', \
          help='drill number; range 0-999')
          # choices=range(0, 1000),
@@ -55,7 +49,6 @@ if __name__ == '__main__':
    # print("called with {}: ".format(sys.argv[0]))
    # print("mode: {}  level: {}  doubles: {}  tiebreaker: {}".format(args.mode_setting,\
    #     args.level_setting, args.doubles_setting, args.tiebreaker_setting))
-
 
    if args.speed_setting < SPEED_MIN or args.speed_setting > SPEED_MAX:
       print("speed not between {} and {}".format(SPEED_MIN, SPEED_MAX))
@@ -82,9 +75,8 @@ if __name__ == '__main__':
       sys.exit(1)
 
 
-   mode = {MODE_PARAM: args.mode_setting, \
-      ID_PARAM: args.drill_id_setting, \
-      TIEBREAKER_PARAM: args.tiebreaker_setting}
+   mode = {MODE_PARAM: DRILL_MODE_E, \
+      ID_PARAM: args.drill_id_setting}
    rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
    if not rc:
       logging.error("PUT Mode failed, code: {}".format(code))

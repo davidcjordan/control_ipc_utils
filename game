@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+
+"""
+Does the following:
+ - configures mode and parameters (level, speed, etc)
+ - sends the start message
+ - checks for Active
+
+ returns 0 on pass; 1 on failure
+"""
+from ctrl_messaging_routines import send_msg, is_active
+from control_ipc_defines import PUT_METHOD, STRT_RSRC, MODE_RSRC, OPTS_RSRC, \
+   LEVEL_MIN, LEVEL_MAX, LEVEL_DEFAULT, \
+   MODE_PARAM, TIEBREAKER_PARAM, \
+   GAME_MODE_E, \
+   LEVEL_PARAM
+
+import argparse
+import logging
+import sys
+
+if __name__ == '__main__':
+   shell_rc = 1
+
+   parser = argparse.ArgumentParser(description='Start boomer')
+   parser.add_argument('-l', '--level', dest='level_setting', \
+         type=int, default=LEVEL_DEFAULT, nargs='?', \
+         help='player skill level; range 10 to 70')
+         # choices=range(LEVEL_MIN, LEVEL_MAX+1), <- removed because it enumerated the range
+   parser.add_argument('-t', '--tiebreaker', dest='tiebreaker_setting', \
+         type=int, choices=range(0, 2), default=0, nargs='?', \
+         help='defaults to game mode')
+
+   args = parser.parse_args()
+
+   if args.level_setting < LEVEL_MIN or args.level_setting > LEVEL_MAX:
+      print("level not between {} and {}".format(LEVEL_MIN, LEVEL_MAX))
+      sys.exit(1)
+
+   active = is_active()
+   if (type(active) is not bool):
+      logging.error("GET Status failed")
+      sys.exit(1)
+   if active:
+      logging.error("Base already active")
+      sys.exit(1)
+
+
+   mode = {MODE_PARAM: GAME_MODE_E, TIEBREAKER_PARAM: args.tiebreaker_setting}
+   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
+   if not rc:
+      logging.error("PUT Mode failed, code: {}".format(code))
+      sys.exit(1)
+
+   params = {LEVEL_PARAM: args.level_setting}
+   rc, code = send_msg(PUT_METHOD, OPTS_RSRC, params)
+   if not rc:
+      logging.error("PUT PARAMS failed, code: {}".format(code))
+      sys.exit(1)
+
+   # start and check for active
+   rc, code = send_msg(PUT_METHOD, STRT_RSRC)
+   if not rc:
+      logging.error("PUT START failed, code: {}".format(code))
+      sys.exit(1)
+   active = is_active()
+   if (type(active) is not bool):
+      logging.error("GET Status failed")
+      sys.exit(1)
+   if not active:
+      logging.error("Base didn't go active after start command")
+      sys.exit(1)

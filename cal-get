@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+
+"""
+Does the following:
+ - sends in the calibration data
+
+ returns 0 on pass; 1 on failure
+"""
+from ctrl_messaging_routines import send_msg
+from control_ipc_defines import GET_METHOD, PUT_METHOD, STRT_RSRC, LCAM_RSRC, RCAM_RSRC
+
+import argparse
+import logging
+import sys
+
+#define NEAR_BASE_LEFT 0			// Near baseline, left singles sideline (bottom left corner of singles court)
+#define NEAR_BASE_RIGHT 1 
+#define NEAR_SERVICE_LEFT 2		// Near service line, left singles sideline
+#define NEAR_SERVICE_CENTER 3		//Near service line, center line (typically called the "T")
+#define NEAR_SERVICE_RIGHT 4
+#define FAR_BASE_LEFT 5				// Far baseline, left singles sideline (Upper left corner of singles court)
+#define FAR_BASE_RIGHT 6
+#define NET_LEFT     7
+#define NET_CENTER    8
+#define NET_RIGHT    9
+#define FAR_SERVICE_LEFT     10
+#define FAR_SERVICE_CENTER    11
+#define FAR_SERVICE_RIGHT    12
+
+
+if __name__ == '__main__':
+   parser = argparse.ArgumentParser(description='Start boomer')
+   parser.add_argument('cam',type=int, default=0, nargs='?', help='camera number: 0 or 1') 
+   args = parser.parse_args()
+   # print("called with {}: ".format(sys.argv[0]))
+   
+   if args.cam == 0:
+      cam_id = LCAM_RSRC
+   else:
+      cam_id = RCAM_RSRC
+   
+   rc, msg = send_msg(GET_METHOD, cam_id)
+   if not rc:
+      logging.error("Get calibratiob failed, code: {}".format(msg))
+      sys.exit(1)
+   else:
+      print("Calib Points: {}".format(msg))

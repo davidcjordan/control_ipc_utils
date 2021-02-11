@@ -61,7 +61,7 @@ def init(read_fifo=_FIFO_BASE_TO_CTRL, write_fifo=_FIFO_CTRL_TO_BASE):
    # except Exception as err:
    #    exception_type = type(err).__name__
    #    print("Unable to open write: " + exception_type)
-      logging.warning("base_boomer not running")
+      logging.warning("can not connect to boomer_base.")
       return False
    
    logging.debug("{} opened.".format(write_fifo))
@@ -78,7 +78,18 @@ def string_to_dict(a_str):
    kv_list = a_str.split(',')
    for kv in kv_list: 
       pair = kv.split(':')
-      dict_out[pair[0]] = pair[1]
+      value = None
+      try:
+         value = int(pair[1])
+      except ValueError:
+         try:
+            value = float(pair[1])
+         except ValueError:
+            continue
+      if value is None:
+         value = pair[1]
+
+      dict_out[pair[0]] = value
    return dict_out
 
 def dict_to_bytes(a_dict):
@@ -182,7 +193,7 @@ def is_active():
       return "error"
    else:
       print("Status: {}".format(status))
-      if (status is not None) and ('active' in status) and (int(status['active']) == 1):
+      if (status is not None) and ('active' in status) and (status['active'] == 1):
          return True
       else:
          return False

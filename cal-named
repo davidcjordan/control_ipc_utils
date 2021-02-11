@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+
+"""
+Does the following:
+ - sends in the calibration data
+
+ returns 0 on pass; 1 on failure
+"""
+from ctrl_messaging_routines import send_msg
+from control_ipc_defines import GET_METHOD, PUT_METHOD, STRT_RSRC, LCAM_RSRC, RCAM_RSRC
+
+import argparse
+import logging
+import sys
+
+if __name__ == '__main__':
+   shell_rc = 1
+
+   parser = argparse.ArgumentParser(description='set calibration points')
+   parser.add_argument('cam',type=int, default=0, help='camera number: 0 or 1', nargs='?')
+
+   parser.add_argument('--nblx',dest='a',type=float, help='NEAR_BASE_LEFT x', nargs='?')
+   parser.add_argument('--nbly',dest='b',type=float, help='NEAR_BASE_LEFT y', nargs='?')
+   parser.add_argument('--nbrx',dest='c',type=float, help='NEAR_BASE_RIGHT x', nargs='?')
+   parser.add_argument('--nbry',dest='d',type=float, help='NEAR_BASE_RIGHT y', nargs='?')
+
+   parser.add_argument('--nslx',dest='e',type=float, help='NEAR_SERVICE_LEFT x', nargs='?')
+   parser.add_argument('--nsly',dest='f',type=float, help='NEAR_SERVICE_LEFT y', nargs='?')
+   parser.add_argument('--nscx',dest='g',type=float, help='NEAR_SERVICE_CENTER x', nargs='?')
+   parser.add_argument('--nscy',dest='h',type=float, help='NEAR_SERVICE_CENTER y', nargs='?')
+   parser.add_argument('--nsrx',dest='i',type=float, help='NEAR_SERVICE_RIGHT x', nargs='?')
+   parser.add_argument('--nsry',dest='j',type=float, help='NEAR_SERVICE_RIGHT y', nargs='?')
+
+   parser.add_argument('--fblx',dest='k',type=float, help='FAR_BASE_LEFT x', nargs='?')
+   parser.add_argument('--fbly',dest='l',type=float, help='FAR_BASE_LEFT y', nargs='?')
+   parser.add_argument('--fbrx',dest='m',type=float, help='FAR_BASE_RIGHT x', nargs='?')
+   parser.add_argument('--fbry',dest='n',type=float, help='FAR_BASE_RIGHT y', nargs='?')
+
+   parser.add_argument('--nlx',dest='o',type=float, help='NET_LEFT x', nargs='?')
+   parser.add_argument('--nly',dest='p',type=float, help='NET_LEFT y', nargs='?')
+   parser.add_argument('--ncx',dest='q',type=float, help='NET_CENTER x', nargs='?')
+   parser.add_argument('--ncy',dest='r',type=float, help='NET_CENTER y', nargs='?')
+   parser.add_argument('--nrx',dest='s',type=float, help='NET_RIGHT x', nargs='?')
+   parser.add_argument('--nry',dest='t',type=float, help='NET_RIGHT y', nargs='?')
+  
+   parser.add_argument('--fslx',dest='u',type=float, help='FAR_SERVICE_LEFT x', nargs='?')
+   parser.add_argument('--fsly',dest='v',type=float, help='FAR_SERVICE_LEFT y', nargs='?')
+   parser.add_argument('--fscx',dest='w',type=float, help='FAR_SERVICE_CENTER x', nargs='?')
+   parser.add_argument('--fscy',dest='x',type=float, help='FAR_SERVICE_CENTER y', nargs='?')
+   parser.add_argument('--fsrx',dest='y',type=float, help='FAR_SERVICE_RIGHT x', nargs='?')
+   parser.add_argument('--fsry',dest='z',type=float, help='FAR_SERVICE_RIGHT y', nargs='?')
+   
+   args = parser.parse_args()
+   # print("called with {}: ".format(sys.argv[0]))
+   
+   if args.cam == 0:
+      cam_id = LCAM_RSRC
+   else:
+      cam_id = RCAM_RSRC
+
+   calib_data = {}
+   points_set = "Set: "
+   
+   for arg in vars(args):
+      if arg is 'cam':
+         continue
+      else:
+         if getattr(args, arg) is not None:
+            calib_data[arg] = getattr(args, arg)
+            # print(arg, getattr(args, arg))
+            arg_index = ord(arg) - ord('a') + 2
+            # print("arg: {}  index: {}".format(arg, arg_index))
+            # print(parser._actions[arg_index].help)
+            points_set += parser._actions[arg_index].help + ", "
+   
+   # print(calib_data)      
+   # sys.exit(1)
+
+   rc, code = send_msg(PUT_METHOD, cam_id, calib_data)
+   if not rc:
+      logging.error("PUT Mode failed, code: {}".format(code))
+      sys.exit(1)
+   else:
+      print(points_set[:-2])  # dont print the trailing ". "

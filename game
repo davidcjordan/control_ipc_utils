@@ -9,11 +9,10 @@ Does the following:
  returns 0 on pass; 1 on failure
 """
 from ctrl_messaging_routines import send_msg, is_active
-from control_ipc_defines import PUT_METHOD, STRT_RSRC, MODE_RSRC, OPTS_RSRC, \
-   LEVEL_MIN, LEVEL_MAX, LEVEL_DEFAULT, \
-   MODE_PARAM, TIEBREAKER_PARAM, \
-   GAME_MODE_E, \
-   LEVEL_PARAM
+from control_ipc_defines import PUT_METHOD, GET_METHOD, STRT_RSRC, MODE_RSRC, OPTS_RSRC, \
+   LEVEL_MIN, LEVEL_MAX, LEVEL_DEFAULT, LEVEL_PARAM, \
+   MODE_PARAM, GAME_MODE_E, TIEBREAKER_PARAM, RUN_REDUCE_PARAM, POINTS_DELAY_PARAM, GRUNTS_PARAM, \
+   SERVE_MODE_PARAM, BOOMER_ALL_SERVES_E, PLAYER_ALL_SERVES_E, ALTERNATE_SERVES_E
 
 import argparse
 import logging
@@ -23,17 +22,25 @@ if __name__ == '__main__':
    shell_rc = 1
 
    parser = argparse.ArgumentParser(description='Start boomer')
-   parser.add_argument('-l', '--level', dest='level_setting', \
-         type=int, default=LEVEL_DEFAULT, nargs='?', \
+   parser.add_argument('-l', '--level', dest='level_setting', type=int, nargs='?', \
          help='player skill level; range 10 to 70')
          # choices=range(LEVEL_MIN, LEVEL_MAX+1), <- removed because it enumerated the range
-   parser.add_argument('-t', '--tiebreaker', dest='tiebreaker_setting', \
-         type=int, choices=range(0, 2), default=0, nargs='?', \
-         help='defaults to game mode')
+   parser.add_argument('-t', '--tiebreaker', dest='tiebreaker_setting', type=int, \
+         choices=range(0, 2), nargs='?', help='0 is standard; 1 is tie-breaker rules')
+   parser.add_argument('-r', '--run_less', dest='run_less', type=int, \
+         choices=range(0, 2), nargs='?', help='1 is less running, 0 is default')
+   parser.add_argument('-d', '--delay', dest='delay', type=int, \
+         choices=range(0, 11), nargs='?', help='seconds of delay after a point')
+   parser.add_argument('-b', '--boomer_serves_all', dest='boomer_serves_all', type=int, \
+         choices=range(0, 2), nargs='?', help='1 makes boomer do all the serves')
+   parser.add_argument('-p', '--player_serves_all', dest='player_serves_all', type=int, \
+         choices=range(0, 2), nargs='?', help='1 makes the player do all the serves')
+   parser.add_argument('-g', '--grunts', dest='grunts', type=int, default=1, \
+         choices=range(0, 2), nargs='?', help='0 is grunts off, 1 is grunts on')
 
    args = parser.parse_args()
 
-   if args.level_setting < LEVEL_MIN or args.level_setting > LEVEL_MAX:
+   if (args.level_setting is not None and (args.level_setting < LEVEL_MIN or args.level_setting > LEVEL_MAX)):
       print("level not between {} and {}".format(LEVEL_MIN, LEVEL_MAX))
       sys.exit(1)
 
@@ -45,14 +52,36 @@ if __name__ == '__main__':
       logging.error("Base already active")
       sys.exit(1)
 
+   mode = {MODE_PARAM: GAME_MODE_E}
+   if args.tiebreaker_setting is not None:
+      mode[TIEBREAKER_PARAM] = args.tiebreaker_setting
 
-   mode = {MODE_PARAM: GAME_MODE_E, TIEBREAKER_PARAM: args.tiebreaker_setting}
    rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
    if not rc:
       logging.error("PUT Mode failed, code: {}".format(code))
       sys.exit(1)
 
-   params = {LEVEL_PARAM: args.level_setting}
+   params = {}
+   if args.level_setting is not None:
+      params[LEVEL_PARAM] = args.level_setting
+   if args.run_less is not None:
+      params[RUN_REDUCE_PARAM] = args.run_less
+   if args.delay is not None:
+      params[POINTS_DELAY_PARAM] = args.delay
+
+   serve_mode = ALTERNATE_SERVES_E
+   if args.boomer_serves_all is not None and args.boomer_serves_all == 1:
+      serve_mode = BOOMER_ALL_SERVES_E
+   elif args.player_serves_all is not None and args.player_serves_all == 1:
+      serve_mode = PLAYER_ALL_SERVES_E
+   # note: if boomer is already in has player or boomer all_serves as true, one of these
+   #   args (player or boomer) has to be called with zero, e.g. -p 0
+   if args.boomer_serves_all is not None or args.player_serves_all is not None:
+      params[SERVE_MODE_PARAM] = serve_mode
+      
+   if args.grunts is not None:
+      params[GRUNTS_PARAM] = args.grunts
+
    rc, code = send_msg(PUT_METHOD, OPTS_RSRC, params)
    if not rc:
       logging.error("PUT PARAMS failed, code: {}".format(code))

@@ -2,12 +2,17 @@
 """
 Sends stop/pause/resume message to boomer_base
 """
-from ctrl_messaging_routines import send_msg, is_active
-from control_ipc_defines import PUT_METHOD, STOP_RSRC, PAUS_RSRC, RESU_RSRC
 import logging
-import sys
+log_format = ('[%(asctime)s] %(levelname)-6s %(message)s')
+logging.basicConfig(format=log_format, level=logging.INFO)
+# logging.basicConfig(format=log_format, level=logging.DEBUG)
+
 
 if __name__ == '__main__':
+   from ctrl_messaging_routines import send_msg, is_active
+   from control_ipc_defines import PUT_METHOD, STOP_RSRC, PAUS_RSRC, RESU_RSRC, UI_TRANSPRT
+   import sys
+
    # print("argv[0]: {}".format(sys.argv[0]))
    resource = None
    if "stop" in sys.argv[0]:
@@ -34,3 +39,5 @@ if __name__ == '__main__':
       if active:
          logging.error("Base didn't go INactive after stop command")
          sys.exit(1)
+      else:
+         logging.info("Boomer is now stopped (inactive)")

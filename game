@@ -8,19 +8,24 @@ Does the following:
 
  returns 0 on pass; 1 on failure
 """
-from ctrl_messaging_routines import send_msg, is_active
-from control_ipc_defines import PUT_METHOD, GET_METHOD, STRT_RSRC, MODE_RSRC, OPTS_RSRC, \
-   LEVEL_MIN, LEVEL_MAX, LEVEL_DEFAULT, LEVEL_PARAM, \
-   MODE_PARAM, GAME_MODE_E, TIEBREAKER_PARAM, RUN_REDUCE_PARAM, POINTS_DELAY_PARAM, GRUNTS_PARAM, \
-   SERVE_MODE_PARAM, BOOMER_ALL_SERVES_E, PLAYER_ALL_SERVES_E, ALTERNATE_SERVES_E
 
-import argparse
 import logging
-import sys
+# https://docs.python.org/3/library/logging.html#logrecord-attributes
+log_format = ('[%(asctime)s] %(levelname)-6s %(message)s')
+logging.basicConfig(format=log_format, level=logging.INFO)
+# logging.basicConfig(format=log_format, level=logging.DEBUG)
 
 if __name__ == '__main__':
+   from ctrl_messaging_routines import send_msg, is_active
+   from control_ipc_defines import PUT_METHOD, GET_METHOD, STRT_RSRC, MODE_RSRC, OPTS_RSRC, \
+      LEVEL_MIN, LEVEL_MAX, LEVEL_DEFAULT, LEVEL_PARAM, \
+      MODE_PARAM, GAME_MODE_E, TIEBREAKER_PARAM, RUN_REDUCE_PARAM, POINTS_DELAY_PARAM, GRUNTS_PARAM, \
+      SERVE_MODE_PARAM, BOOMER_ALL_SERVES_E, PLAYER_ALL_SERVES_E, ALTERNATE_SERVES_E
+   import sys
+
    shell_rc = 1
 
+   import argparse
    parser = argparse.ArgumentParser(description='Start boomer')
    parser.add_argument('-l', '--level', dest='level_setting', type=int, nargs='?', \
          help='player skill level; range 10 to 70')
@@ -85,17 +90,19 @@ if __name__ == '__main__':
    rc, code = send_msg(PUT_METHOD, OPTS_RSRC, params)
    if not rc:
       logging.error("PUT PARAMS failed, code: {}".format(code))
-      sys.exit(1)
+      sys.exit(shell_rc)
 
    # start and check for active
    rc, code = send_msg(PUT_METHOD, STRT_RSRC)
    if not rc:
       logging.error("PUT START failed, code: {}".format(code))
-      sys.exit(1)
+      sys.exit(shell_rc)
    active = is_active()
    if (type(active) is not bool):
       logging.error("GET Status failed")
-      sys.exit(1)
+      sys.exit(shell_rc)
    if not active:
       logging.error("Base didn't go active after start command")
-      sys.exit(1)
+      sys.exit(shell_rc)
+   else:
+      logging.info("Boomer is now active in game mode.")

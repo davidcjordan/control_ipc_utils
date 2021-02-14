@@ -9,40 +9,38 @@ import logging
 import time
 
 from control_ipc_defines import RSRC_OFFSET, GET_METHOD, PUT_METHOD, RSP_METHOD, STAT_RSRC, \
-   RESP_OK, MAX_MESSAGE_SIZE, HEADER_LENGTH
-
-_logger = logging.getLogger(__name__)
-# log_format = ('[%(asctime)s] %(levelname)-6s %(name)-12s %(message)s')
-_log_format = ('[%(asctime)s] %(levelname)-6s %(message)s')
-
-logging.basicConfig(
-   # level=logging.DEBUG,
-   level=logging.INFO,
-   format=_log_format,
-   # filename=('debug.log'),
-)
+   RESP_OK, MAX_MESSAGE_SIZE, HEADER_LENGTH, BASE_NAME, CTRL_NAME, UI_NAME, CTRL_TRANSPRT, UI_TRANSPRT
 
 _RESP_CODE_START = RSRC_OFFSET + 1
 _OK = bytearray(RSP_METHOD + "  " + str(RESP_OK), 'utf-8')
-
-if 'darwin' in _platform:
-   _FIFO_BASE_TO_CTRL = "/tmp/BaseToCtrl.fifo"
-   _FIFO_CTRL_TO_BASE = "/tmp/CtrlToBase.fifo"
-else:
-   _FIFO_BASE_TO_CTRL = "/dev/shm/BaseToCtrl.fifo"
-   _FIFO_CTRL_TO_BASE = "/dev/shm/CtrlToBase.fifo"
 
 _fd_read = None
 _fd_write = None
 _non_empty_pipe_count = 0
 
 
-def init(read_fifo=_FIFO_BASE_TO_CTRL, write_fifo=_FIFO_CTRL_TO_BASE):
+def init(channel=CTRL_TRANSPRT):
    global _fd_read
    global _fd_write
 
    if _fd_write is not None:
       return True
+
+   if channel == CTRL_TRANSPRT:
+      logging.debug("Using control channel")
+      fifo_base_to_x_name = BASE_NAME + "To" + CTRL_NAME + ".fifo"
+      fifo_x_to_base_name = CTRL_NAME + "To" + BASE_NAME + ".fifo"
+   else:
+      logging.debug("Using UI channel")
+      fifo_base_to_x_name = BASE_NAME + "To" + UI_NAME + ".fifo"
+      fifo_x_to_base_name = UI_NAME + "To" + BASE_NAME + ".fifo"
+
+   if 'darwin' in _platform:
+      read_fifo = "/tmp/" + fifo_base_to_x_name
+      write_fifo = "/tmp/" + fifo_x_to_base_name
+   else:
+      read_fifo = "/dev/shm/" + fifo_base_to_x_name
+      write_fifo  = "/dev/shm/" + fifo_x_to_base_name
 
    try:
       _os.mkfifo(write_fifo)
@@ -125,10 +123,10 @@ def empty_pipe():
          pipe_empty = True
 
 
-def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}):
+def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}, channel=CTRL_TRANSPRT):
    global _fd_read
    global _fd_write
-   if not init():
+   if not init(channel):
       return False, "444"
    # time.sleep(0.2)
    empty_pipe()
@@ -192,7 +190,7 @@ def is_active():
       print("Error getting status")
       return "error"
    else:
-      print("Status: {}".format(status))
+      # print("Status: {}".format(status))
       if (status is not None) and ('active' in status) and (status['active'] == 1):
          return True
       else:

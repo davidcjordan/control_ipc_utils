@@ -32,77 +32,58 @@ if __name__ == '__main__':
    else:
       do_positional_args = True
 
-   # sys.exit(1)
+   calib_full_names = {
+      'a' : 'NEAR_BASE_LEFT', \
+      'c' : 'NEAR_BASE_RIGHT', \
+      'e' : 'NEAR_SERVICE_LEFT', \
+      'g' : 'NEAR_SERVICE_CENTER', \
+      'i' : 'NEAR_SERVICE_RIGHT', \
+      'k' : 'FAR_BASE_LEFT', \
+      'm' : 'FAR_BASE_RIGHT', \
+      'o' : 'NET_LEFT', \
+      'q' : 'NET_CENTER', \
+      's' : 'NET_RIGHT', \
+      'u' : 'FAR_SERVICE_LEFT', \
+      'w' : 'FAR_SERVICE_CENTER', \
+      'y' : 'FAR_SERVICE_RIGHT' }
+   calib_switch_names = {
+      'a' : 'nbl', \
+      'c' : 'nbr', \
+      'e' : 'nsl', \
+      'g' : 'nsc', \
+      'i' : 'nsr', \
+      'k' : 'fbl', \
+      'm' : 'fbr', \
+      'o' : 'nl', \
+      'q' : 'nc', \
+      's' : 'nr', \
+      'u' : 'fsl', \
+      'w' : 'fsc', \
+      'y' : 'fsr' }
 
    parser = argparse.ArgumentParser(description='Get-Put calibration points for cameras')
    if method == GET_METHOD:
       parser.add_argument('cam',type=int, default=0, nargs='?', help='camera number: 0 or 1')
    elif do_positional_args:
       parser.add_argument('cam',type=int, default=0, help='camera number: 0 or 1')
-
-      parser.add_argument('a',type=float, help='NEAR_BASE_LEFT x')
-      parser.add_argument('b',type=float, help='NEAR_BASE_LEFT y')
-      parser.add_argument('c',type=float, help='NEAR_BASE_RIGHT x')
-      parser.add_argument('d',type=float, help='NEAR_BASE_RIGHT y')
-
-      parser.add_argument('e',type=float, help='NEAR_SERVICE_LEFT x')
-      parser.add_argument('f',type=float, help='NEAR_SERVICE_LEFT y')
-      parser.add_argument('g',type=float, help='NEAR_SERVICE_CENTER x')
-      parser.add_argument('h',type=float, help='NEAR_SERVICE_CENTER y')
-      parser.add_argument('i',type=float, help='NEAR_SERVICE_RIGHT x')
-      parser.add_argument('j',type=float, help='NEAR_SERVICE_RIGHT y')
-
-      parser.add_argument('k',type=float, help='FAR_BASE_LEFT x')
-      parser.add_argument('l',type=float, help='FAR_BASE_LEFT y')
-      parser.add_argument('m',type=float, help='FAR_BASE_RIGHT x')
-      parser.add_argument('n',type=float, help='FAR_BASE_RIGHT y')
-
-      parser.add_argument('o',type=float, help='NET_LEFT x')
-      parser.add_argument('p',type=float, help='NET_LEFT y')
-      parser.add_argument('q',type=float, help='NET_CENTER x')
-      parser.add_argument('r',type=float, help='NET_CENTER y')
-      parser.add_argument('s',type=float, help='NET_RIGHT x')
-      parser.add_argument('t',type=float, help='NET_RIGHT y')
-   
-      parser.add_argument('u',type=float, help='FAR_SERVICE_LEFT x', nargs='?')
-      parser.add_argument('v',type=float, help='FAR_SERVICE_LEFT y', nargs='?')
-      parser.add_argument('w',type=float, help='FAR_SERVICE_CENTER x', nargs='?')
-      parser.add_argument('x',type=float, help='FAR_SERVICE_CENTER y', nargs='?')
-      parser.add_argument('y',type=float, help='FAR_SERVICE_RIGHT x', nargs='?')
-      parser.add_argument('z',type=float, help='FAR_SERVICE_RIGHT y', nargs='?')
+      for key, value in calib_switch_names.items():
+         if key < 'u':
+            # the first 10 calib points are required
+            parser.add_argument(key,type=float, help=calib_full_names[key] + ' x')
+            y_key = chr(ord(key)+1)
+            parser.add_argument(y_key,type=float, help=calib_full_names[key] + ' y')
+         else:
+            # the last 3 calib points are optional
+            parser.add_argument(key,type=float, help=calib_full_names[key] + ' x', nargs='?')
+            y_key = chr(ord(key)+1)
+            parser.add_argument(y_key,type=float, help=calib_full_names[key] + ' y', nargs='?')
    else:
       parser.add_argument('cam',type=int, default=0, help='camera number: 0 or 1', nargs='?')
-
-      parser.add_argument('--nblx',dest='a',type=float, help='NEAR_BASE_LEFT x', nargs='?')
-      parser.add_argument('--nbly',dest='b',type=float, help='NEAR_BASE_LEFT y', nargs='?')
-      parser.add_argument('--nbrx',dest='c',type=float, help='NEAR_BASE_RIGHT x', nargs='?')
-      parser.add_argument('--nbry',dest='d',type=float, help='NEAR_BASE_RIGHT y', nargs='?')
-
-      parser.add_argument('--nslx',dest='e',type=float, help='NEAR_SERVICE_LEFT x', nargs='?')
-      parser.add_argument('--nsly',dest='f',type=float, help='NEAR_SERVICE_LEFT y', nargs='?')
-      parser.add_argument('--nscx',dest='g',type=float, help='NEAR_SERVICE_CENTER x', nargs='?')
-      parser.add_argument('--nscy',dest='h',type=float, help='NEAR_SERVICE_CENTER y', nargs='?')
-      parser.add_argument('--nsrx',dest='i',type=float, help='NEAR_SERVICE_RIGHT x', nargs='?')
-      parser.add_argument('--nsry',dest='j',type=float, help='NEAR_SERVICE_RIGHT y', nargs='?')
-
-      parser.add_argument('--fblx',dest='k',type=float, help='FAR_BASE_LEFT x', nargs='?')
-      parser.add_argument('--fbly',dest='l',type=float, help='FAR_BASE_LEFT y', nargs='?')
-      parser.add_argument('--fbrx',dest='m',type=float, help='FAR_BASE_RIGHT x', nargs='?')
-      parser.add_argument('--fbry',dest='n',type=float, help='FAR_BASE_RIGHT y', nargs='?')
-
-      parser.add_argument('--nlx',dest='o',type=float, help='NET_LEFT x', nargs='?')
-      parser.add_argument('--nly',dest='p',type=float, help='NET_LEFT y', nargs='?')
-      parser.add_argument('--ncx',dest='q',type=float, help='NET_CENTER x', nargs='?')
-      parser.add_argument('--ncy',dest='r',type=float, help='NET_CENTER y', nargs='?')
-      parser.add_argument('--nrx',dest='s',type=float, help='NET_RIGHT x', nargs='?')
-      parser.add_argument('--nry',dest='t',type=float, help='NET_RIGHT y', nargs='?')
-
-      parser.add_argument('--fslx',dest='u',type=float, help='FAR_SERVICE_LEFT x', nargs='?')
-      parser.add_argument('--fsly',dest='v',type=float, help='FAR_SERVICE_LEFT y', nargs='?')
-      parser.add_argument('--fscx',dest='w',type=float, help='FAR_SERVICE_CENTER x', nargs='?')
-      parser.add_argument('--fscy',dest='x',type=float, help='FAR_SERVICE_CENTER y', nargs='?')
-      parser.add_argument('--fsrx',dest='y',type=float, help='FAR_SERVICE_RIGHT x', nargs='?')
-      parser.add_argument('--fsry',dest='z',type=float, help='FAR_SERVICE_RIGHT y', nargs='?')
+      for key, value in calib_switch_names.items():
+         base_switch = '--' + value
+         parser.add_argument(base_switch + "x",dest=key,type=float, help=calib_full_names[key] + ' x', nargs='?')
+         y_key = chr(ord(key)+1)
+         parser.add_argument(base_switch + "y",dest=y_key,type=float, help=calib_full_names[key] + ' y', nargs='?')
 
    args = parser.parse_args()
    if args.cam == 0:
@@ -136,7 +117,16 @@ if __name__ == '__main__':
          logging.error("Get calibration points failed, code: {}".format(msg))
          sys.exit(1)
       else:
-         print("Calib Points: {}".format(msg))
+         # print("Calib Points: {}".format(msg))
+         for key, value in msg.items():
+            index = ord(key) - ord('a')
+            if (index % 2) == 0:
+               prev_key = key
+               prev_value = value
+               point_name = calib_full_names[key]
+            else:
+               # print("{}-{} {} X: {} Y: {}".format(prev_key, key, point_name, prev_value, value))
+               print("{:>20}  X:{:6.1f}   Y:{:6.1f}".format(point_name, prev_value, value))
    else:
       rc, code = send_msg(method, cam_id, calib_data)
       if not rc:

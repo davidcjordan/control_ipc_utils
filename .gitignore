@@ -1,6 +1,5 @@
 .vscode
 __pycache__
 message.proto
-control_ipc_defines*
 pause
 resume

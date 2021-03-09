@@ -3,3 +3,4 @@ __pycache__
 message.proto
 pause
 resume
+drill_file_defines.*

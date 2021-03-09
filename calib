@@ -67,13 +67,13 @@ if __name__ == '__main__':
    elif do_positional_args:
       parser.add_argument('cam',type=int, default=0, help='camera number: 0 or 1')
       for key, value in calib_switch_names.items():
-         if key < 'u':
-            # the first 10 calib points are required
+         if key < 'o':
+            # the first 7 calib points are required
             parser.add_argument(key,type=float, help=calib_full_names[key] + ' x')
             y_key = chr(ord(key)+1)
             parser.add_argument(y_key,type=float, help=calib_full_names[key] + ' y')
          else:
-            # the last 3 calib points are optional
+            # the last 6 calib points are optional
             parser.add_argument(key,type=float, help=calib_full_names[key] + ' x', nargs='?')
             y_key = chr(ord(key)+1)
             parser.add_argument(y_key,type=float, help=calib_full_names[key] + ' y', nargs='?')

@@ -20,8 +20,9 @@ if __name__ == '__main__':
   STOP_PATTERN = COMMENT_PATTERN + "end"
   DEFINE_PATTERN = "#define "
   OUTPUT_FILE = "control_ipc_defines.py"
+  # OUTPUT_FILE = "drill_file_defines.py"
 
-  parser = argparse.ArgumentParser(description='Start boomer')
+  parser = argparse.ArgumentParser(description='convert C defines to python')
   parser.add_argument('-p', '--path', dest='h_file_dir', \
         type=str, default="../ipc/", nargs='?', \
         help='path to directory with h files')
@@ -32,6 +33,7 @@ if __name__ == '__main__':
   in_defines_region = False
   out_file = open(OUTPUT_FILE, 'w')
   define_files = ['ipc_control.h', 'global_parameters.h']
+  # define_files = ['drill_file.h']
  
   for define_file in define_files:
     with open(args.h_file_dir + define_file) as f: 

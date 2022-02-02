@@ -7,6 +7,7 @@ import errno as _errno
 from select import select as _select
 import logging
 import time
+import json
 
 from control_ipc_defines import RSRC_OFFSET, GET_METHOD, PUT_METHOD, RSP_METHOD, STAT_RSRC, \
    RESP_OK, MAX_MESSAGE_SIZE, HEADER_LENGTH, BASE_NAME, CTRL_NAME, UI_NAME, CTRL_TRANSPRT, UI_TRANSPRT
@@ -18,6 +19,8 @@ _fd_read = None
 _fd_write = None
 _non_empty_pipe_count = 0
 
+# normally inherits log level from calling scripts
+# logging.basicConfig(level=logging.DEBUG)
 
 def init(channel=CTRL_TRANSPRT):
    global _fd_read
@@ -70,25 +73,6 @@ def init(channel=CTRL_TRANSPRT):
    # _fd_read = _os.open(read_fifo, _os.O_RDONLY | _os.O_NONBLOCK)
    logging.debug("{} opened.".format(read_fifo))
    return True
-
-def string_to_dict(a_str):
-   dict_out = {}
-   kv_list = a_str.split(',')
-   for kv in kv_list: 
-      pair = kv.split(':')
-      value = None
-      try:
-         value = int(pair[1])
-      except ValueError:
-         try:
-            value = float(pair[1])
-         except ValueError:
-            continue
-      if value is None:
-         value = pair[1]
-
-      dict_out[pair[0]] = value
-   return dict_out
 
 def dict_to_bytes(a_dict):
    ret_str = ""
@@ -168,12 +152,12 @@ def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}, channel=CTRL_TR
    if len(data) == 0:
       logging.debug("FIFO read failed; write end closed?")
    else:
-      logging.debug("Read: {}{}".format(data[0:HEADER_LENGTH], data[HEADER_LENGTH:]))
+      logging.debug(f"Read: {data[0:HEADER_LENGTH]}{data[HEADER_LENGTH:]}")
       code = data[_RESP_CODE_START:HEADER_LENGTH]
       if data.startswith(_OK):
          rc = True
          if len(data) > HEADER_LENGTH:
-            msg = string_to_dict(data[HEADER_LENGTH:].decode("utf-8"))
+            msg = json.loads(data[HEADER_LENGTH:].decode("utf-8"))
       else:
             logging.error(
                "{} {} rejected - code: {}".format(method, resource, code))

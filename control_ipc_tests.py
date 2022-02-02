@@ -2,8 +2,11 @@
 
 from ctrl_messaging_routines import send_msg, is_active
 from control_ipc_defines import GAME_MODE_E, DRILL_MODE_E, \
-   MODE_RSRC, STAT_RSRC, STRT_RSRC, STOP_RSRC, \
+   MODE_RSRC, STAT_RSRC, STRT_RSRC, STOP_RSRC, OPTS_RSRC, \
    GET_METHOD, PUT_METHOD
+from control_ipc_defines import LEVEL_DEFAULT, SPEED_DEFAULT, DELAY_DEFAULT, HEIGHT_DEFAULT
+from control_ipc_defines import LEVEL_MIN, SPEED_MIN, DELAY_MIN, HEIGHT_MIN
+from control_ipc_defines import LEVEL_MAX, SPEED_MAX, DELAY_MAX, HEIGHT_MAX
 import logging
 import sys
 
@@ -13,7 +16,7 @@ log_format = ('[%(asctime)s] %(levelname)-6s %(message)s')
 
 logging.basicConfig(
     level=logging.DEBUG,
-    # level=logging.INFO,
+   #  level=logging.INFO,
     format=log_format,
     # filename=('debug.log'),
 )
@@ -21,19 +24,23 @@ logging.basicConfig(
 # logging.info("status: {}".format(send_msg(GET_METHOD, STATUS)))
 
 # mode_default = {'mode': 1, 'drill_workout_id': 0, 'drill_step': 0} #, 'iterations': 0}
-mode_default = {'mode': 1, 'id': 0, 'step': 0, 'doubles': 0, 'tiebreaker': 0}
-params_default = {'level': 2, 'speed': 100, 'height': 0, 'delay': 0}
-cam_test = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 'f':5, 'g':7, 'h':8, 'i':9, 'j':10, 'k':11, 'l':12, 'm':13, 'n':1014}
+mode_default = {'mode': 1, 'id': 0, 'step': 0, 'tiebreaker': 0}
+params_default = {'level': LEVEL_DEFAULT, 'speed': SPEED_DEFAULT, 'height': HEIGHT_DEFAULT, 'delay': DELAY_DEFAULT}
+params_pattern1 = {'level': LEVEL_MAX, 'speed': SPEED_MIN, 'height': HEIGHT_MAX, 'delay': DELAY_MIN, \
+   "wServes":2,"reduceRun":0,"ptDelay":1,"grunts":0}
+params_pattern2 = {'level': LEVEL_MIN, 'speed': SPEED_MAX, 'height': HEIGHT_MIN, 'delay': DELAY_MAX, \
+   "wServes":1,"reduceRun":1,"ptDelay":-2,"grunts":1}
+params_patterns = [params_pattern1, params_pattern2]
 
 def run_tests():
-   # print("Game test result: {}\n".format(test_game(doubles=False, tie_breaker=True)))
-   # print("Game test result: {}\n".format(test_game(doubles=True, tie_breaker=False)))
-   print("Drill test result: {}\n".format(test_drill(drill_id=39)))
-   # print("Mode test result: {}\n".format(test_register(RSRC_MODE, mode_default)))
-   # print("Params test result: {}\n".format(test_register(RSRS_LDSH, params_default)))
+   # print("Game test result: {}".format(test_game(tie_breaker=True)))
+   # print("Game test result: {}".format(test_game(tie_breaker=False)))
+   # print("Drill test result: {}".format(test_drill(drill_id=39)))
+   # print("Mode test result: {}".format(test_register(MODE_RSRC, mode_default)))
+   print("Params test result: {}".format(test_register(OPTS_RSRC, params_patterns)))
 
 
-def test_game(doubles=False, tie_breaker=False):
+def test_game(tie_breaker=False):
    # sets mode, params; starts game; stops game
    test_rc = True
    active = is_active()
@@ -43,10 +50,9 @@ def test_game(doubles=False, tie_breaker=False):
       print("Base is already active")
       return False
 
-   int_doubles = int(doubles == True)
    int_tiebreaker = int(tie_breaker == True)
 
-   mode = {'mode': GAME_MODE_E, 'doubles': int_doubles, 'tie_breaker': int_tiebreaker}
+   mode = {'mode': GAME_MODE_E, 'tie_breaker': int_tiebreaker}
    rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
    if not rc:
       logging.error("test_game: initial PUT mode failed, code: {}".format(code))
@@ -84,9 +90,6 @@ def test_game(doubles=False, tie_breaker=False):
    if (register is not None):
       if register['mode'] != str(GAME_MODE_E):
          logging.error("test_game: mode check failed, expected: {}, got {}:".format(GAME_MODE_E, register['mode']))
-         test_rc = False
-      if (('doubles' in register) and (register['doubles'] != str(int_doubles))):
-         logging.error("test_game: doubles check failed, expected: {}, got {}:".format(int_doubles, register['doubles']))
          test_rc = False
       if (('tie_breaker' in register) and (register['tie_breaker'] != str(int_tiebreaker))):
          logging.error("test_game: tiebreaker check failed, expected: {}, got {}:".format(int_tiebreaker, register['tie_breaker']))
@@ -137,45 +140,41 @@ def test_drill(drill_id=39):
    return test_rc
 
 
-def test_register(register_under_test, default_values):
-    test_pattern = {}
-    read_back_compare = True
-    msg_ok, register_original = send_msg(GET_METHOD, register_under_test)
-    if not msg_ok:
-        logging.error("GET {} failed.".format(register_under_test))
-        return False
+def test_register(register_under_test, patterns):
+   test_pattern = {}
+   read_back_compare = True
+   msg_ok, register_original = send_msg(GET_METHOD, register_under_test)
+   if not msg_ok:
+      logging.error("GET {} failed.".format(register_under_test))
+      return False
    #  if len(register_original) == 0:
    #      register_original = default_values
-    full_dict = default_values
-    logging.debug("register before test: {}".format(register_original))
-    for i in range(len(full_dict)):
-        j = 0
-        for key in full_dict:
-            if j == i:
-                test_pattern[key] = 1
-            else:
-                test_pattern[key] = 2
-            j += 1
-        logging.debug("Setting {} to: {}".format(register_under_test, test_pattern))
-        if send_msg(PUT_METHOD, register_under_test, test_pattern) == False:
-            logging.error("PUT {} failed".format(register_under_test))
-            break
-        msg_ok, reg_read_back = send_msg(GET_METHOD, register_under_test)
-        if not msg_ok:
-            logging.error("GET {} failed.".format(register_under_test))
-            return False
-        for key in full_dict:
-            if reg_read_back[key] != test_pattern[key]:
-                logging.error("{}: read: {} not equal to mode write: {}".format(register_under_test,test_pattern, reg_read_back))
-                read_back_compare = False
-                break
-        if not read_back_compare:
-            break
-    #restore 
-    if (send_msg(PUT_METHOD, register_under_test, register_original) == False):
-        logging.error("restore {} failed".format(register_under_test))
-    logging.info("Register test done: {} restored to: {}".format(register_under_test, register_original))
-    return(read_back_compare)
+   logging.debug(f"register before test: {register_original}")
+
+   for pattern in patterns:
+      logging.debug(f"Setting {register_under_test} to: {pattern}")
+      if send_msg(PUT_METHOD, register_under_test, pattern) == False:
+         logging.error(f"PUT {register_under_test} failed")
+         read_back_compare = False
+         break
+      msg_ok, reg_read_back = send_msg(GET_METHOD, register_under_test)
+      if not msg_ok:
+         logging.error(f"GET {register_under_test} failed.")
+         read_back_compare = False
+         break
+      for key in pattern:
+         if reg_read_back[key] != pattern[key]:
+               logging.error(f"{register_under_test}: read: {pattern} not equal to values written: {reg_read_back}")
+               read_back_compare = False
+               break
+      if not read_back_compare:
+         break
+
+   #restore 
+   if (send_msg(PUT_METHOD, register_under_test, register_original) == False):
+      logging.error(f"restore {register_under_test} failed")
+   logging.info(f"Register test done: {register_under_test} restored to: {register_original}")
+   return(read_back_compare)
 
 if __name__ == "__main__":
     run_tests()

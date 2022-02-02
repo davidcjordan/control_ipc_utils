@@ -4,3 +4,4 @@ message.proto
 pause
 resume
 drill_file_defines.*
+control_ipc_defines.py

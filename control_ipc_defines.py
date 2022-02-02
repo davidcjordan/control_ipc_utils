@@ -1,4 +1,6 @@
 
+from enum import Enum
+
 # defines from file: ipc_control.h
 MAX_MESSAGE_SIZE = 252
 RSRC_STRING_LENGTH = 4
@@ -14,10 +16,9 @@ PAUS_RSRC = "PAUS"
 RESU_RSRC = "RESU"
 MODE_RSRC = "MODE"
 OPTS_RSRC = "OPTS" #drill & game options: level, delay, speed, height can be changed on the fly
-LCAM_RSRC = "LCAM" #left cam
-RCAM_RSRC = "RCAM" #right cam
 SCOR_RSRC = "SCOR" #player scores
 IPCS_RSRC = "IPCS" #game IPC statistics
+FLTS_RSRC = "FLTS" #list of faults
 GAME_MODE_E = 1
 DRILL_MODE_E = 2
 WORKOUT_MODE_E = 3
@@ -76,10 +77,13 @@ CTRL_NAME = "Ctrl"
 UI_NAME = "Ui"
 
 # defines from file: global_parameters.h
-LEVEL_MIN = 10
+SAME_LEVEL_AS_BOOMER = 11
+EASIER_LEVEL_THAN_BOOMER = 12
+HARDER_LEVEL_THAN_BOOMER = 13
+LEVEL_MIN = 20
 LEVEL_MAX = 70
-LEVEL_DEFAULT = 20
-LEVEL_STEP = 1 #Dave wants to be to change this at a finer scale than presented to a user
+LEVEL_DEFAULT = 25
+LEVEL_STEP = 5 #Dave wants to be to change this at a finer scale than presented to a user
 LEVEL_UI_STEP = 5
 LEVEL_UI_FACTOR = 10 #the UI would divide the min/max/default & ui_step by this number to present to the user
 SPEED_MIN = 80
@@ -97,8 +101,28 @@ DELAY_STEP = 100
 DELAY_UI_STEP = 100
 DELAY_UI_FACTOR = 1000
 
-GAME_POINT_DELAY_MIN = 0
-GAME_POINT_DELAY_MAX = 10
-GAME_POINT_DELAY_DEFAULT = 0
-GAME_POINT_DELAY_STEP = 1
-
+# defines from file: common_code/fault.h
+class fault_e(Enum):
+  FAULT_BEGIN = 0
+  DEVICE_FAILURE_ON_INIT = 1
+  CAM_FAILURE_ON_SET_MODE = 2
+  CAM_FAILURE_ON_SET_CONTROL = 3
+  CAM_FAILURE_TO_CAPTURE = 4
+  CAM_FAILED_PARAMETER_LOAD = 5
+  NOT_RECEIVING_FROM_NETWORK_DEVICE = 6
+  UNRECOGNIZED_IP = 7
+  UNSUPPORTED_COMMAND = 8
+  PRIORITY_CAPABILITY_NOT_SET = 9
+  UNRECOGNIZED_FAULT_CODE = 10
+  UNRECOGNIZED_FAULT_LOCATION = 11
+  NOT_RECEIVING_DATA_FROM_CAM = 12
+  CAM_SET_GAIN_FAILED = 13
+  CAM_SET_EXPOSURE_FAILED = 14
+  CAMERAS_NOT_SYNCHRONIZED = 15
+  FAULT_END = 16
+class net_device_e(Enum):
+  LEFT = 0
+  RIGHT = 1
+  SPEAKER = 2
+  BASE = 3
+  UNRECOGNIZED_DEVICE = 4

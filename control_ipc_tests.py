@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
 from ctrl_messaging_routines import send_msg, is_active
-from control_ipc_defines import GAME_MODE_E, DRILL_MODE_E, \
-   MODE_RSRC, STAT_RSRC, STRT_RSRC, STOP_RSRC, OPTS_RSRC, \
-   GET_METHOD, PUT_METHOD
-from control_ipc_defines import LEVEL_DEFAULT, SPEED_DEFAULT, DELAY_DEFAULT, HEIGHT_DEFAULT
+from control_ipc_defines import GET_METHOD, PUT_METHOD, \
+   MODE_RSRC, STAT_RSRC, STRT_RSRC, STOP_RSRC, OPTS_RSRC
+from control_ipc_defines import GAME_MODE_E,DRILL_MODE_E,WORKOUT_MODE_E
 from control_ipc_defines import LEVEL_MIN, SPEED_MIN, DELAY_MIN, HEIGHT_MIN
 from control_ipc_defines import LEVEL_MAX, SPEED_MAX, DELAY_MAX, HEIGHT_MAX
 import logging
@@ -15,17 +14,14 @@ logger = logging.getLogger(__name__)
 log_format = ('[%(asctime)s] %(levelname)-6s %(message)s')
 
 logging.basicConfig(
-    level=logging.DEBUG,
-   #  level=logging.INFO,
+   #  level=logging.DEBUG,
+    level=logging.INFO,
     format=log_format,
     # filename=('debug.log'),
 )
 
-# logging.info("status: {}".format(send_msg(GET_METHOD, STATUS)))
-
-# mode_default = {'mode': 1, 'drill_workout_id': 0, 'drill_step': 0} #, 'iterations': 0}
-mode_default = {'mode': 1, 'id': 0, 'step': 0, 'tiebreaker': 0}
-params_default = {'level': LEVEL_DEFAULT, 'speed': SPEED_DEFAULT, 'height': HEIGHT_DEFAULT, 'delay': DELAY_DEFAULT}
+mode_pattern1 = {'mode': WORKOUT_MODE_E, 'id': 22, 'step': 2, 'tiebreaker': 0}
+mode_patterns = [mode_pattern1]
 params_pattern1 = {'level': LEVEL_MAX, 'speed': SPEED_MIN, 'height': HEIGHT_MAX, 'delay': DELAY_MIN, \
    "wServes":2,"reduceRun":0,"ptDelay":1,"grunts":0}
 params_pattern2 = {'level': LEVEL_MIN, 'speed': SPEED_MAX, 'height': HEIGHT_MIN, 'delay': DELAY_MAX, \
@@ -33,11 +29,11 @@ params_pattern2 = {'level': LEVEL_MIN, 'speed': SPEED_MAX, 'height': HEIGHT_MIN,
 params_patterns = [params_pattern1, params_pattern2]
 
 def run_tests():
+   print("Mode test result: {}".format(test_register(MODE_RSRC, mode_patterns)))
+   print("Params test result: {}".format(test_register(OPTS_RSRC, params_patterns)))
+   print("Drill test result: {}".format(test_drill(drill_id=39)))
    # print("Game test result: {}".format(test_game(tie_breaker=True)))
    # print("Game test result: {}".format(test_game(tie_breaker=False)))
-   # print("Drill test result: {}".format(test_drill(drill_id=39)))
-   # print("Mode test result: {}".format(test_register(MODE_RSRC, mode_default)))
-   print("Params test result: {}".format(test_register(OPTS_RSRC, params_patterns)))
 
 
 def test_game(tie_breaker=False):

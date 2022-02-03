@@ -2,6 +2,7 @@
 """
 get list of faults from boomer_base
 """
+import datetime
 import logging
 log_format = ('[%(asctime)s] %(levelname)-6s %(message)s')
 logging.basicConfig(format=log_format, level=logging.INFO)
@@ -10,7 +11,9 @@ logging.basicConfig(format=log_format, level=logging.INFO)
 
 if __name__ == '__main__':
    from ctrl_messaging_routines import send_msg
-   from control_ipc_defines import GET_METHOD, FLTS_RSRC, UI_TRANSPRT, fault_e, net_device_e
+   from control_ipc_defines import GET_METHOD, UI_TRANSPRT
+   from control_ipc_defines import FLTS_RSRC, FLT_CODE_PARAM, FLT_LOCATION_PARAM, FLT_TIMESTAMP_PARAM
+   from control_ipc_defines import fault_e, net_device_e
    import sys
 
    msg_ok, status = send_msg()
@@ -28,6 +31,8 @@ if __name__ == '__main__':
          else:
             # print(f"faults: {faults}")
             if len(faults) > 0:
-               print("Fault                                Device")
+               print("Fault                                Device     Time")
                for fault in faults:
-                  print(f"{fault_e(fault['C']).name:36} {net_device_e(fault['L']).name}")
+                  timestamp = datetime.datetime.fromtimestamp(fault[FLT_TIMESTAMP_PARAM])
+                  date_time = timestamp.strftime("%Y/%m/%d_%H:%M:%S")
+                  print(f"{fault_e(fault[FLT_CODE_PARAM]).name:36s} {net_device_e(fault[FLT_LOCATION_PARAM]).name:9s} {date_time}")

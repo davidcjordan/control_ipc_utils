@@ -3,7 +3,7 @@
 """
 Does the following:
  - configures mode and parameters (level, speed, etc)
- - sends the start message
+ - sends the start message: NOTE: the drill starts in the pause state and is started with the remote
  - checks for Active
 
  returns 0 on pass; 1 on failure

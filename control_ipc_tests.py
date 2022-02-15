@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 from ctrl_messaging_routines import send_msg, is_active
-from control_ipc_defines import GET_METHOD, PUT_METHOD, \
-   MODE_RSRC, STAT_RSRC, STRT_RSRC, STOP_RSRC, OPTS_RSRC
-from control_ipc_defines import GAME_MODE_E,DRILL_MODE_E,WORKOUT_MODE_E
-from control_ipc_defines import LEVEL_MIN, SPEED_MIN, DELAY_MOD_MIN, HEIGHT_MIN
-from control_ipc_defines import LEVEL_MAX, SPEED_MAX, DELAY_MAX, HEIGHT_MAX
+# from control_ipc_defines import GET_METHOD, PUT_METHOD, \
+#    MODE_RSRC, STAT_RSRC, STRT_RSRC, STOP_RSRC, BCFG_RSRC, DCFG_RSRC, GCFG_RSRC
+# from control_ipc_defines import base_mode_e
+# from control_ipc_defines import LEVEL_MIN, SPEED_MOD_MIN, DELAY_MOD_MIN, ELEVATION_ANGLE_MOD_MIN
+# from control_ipc_defines import LEVEL_MAX, SPEED_MOD_MAX, DELAY_MOD_MAX, ELEVATION_ANGLE_MOD_MAX
+from control_ipc_defines import *
 import logging
 import sys
 
@@ -14,27 +15,37 @@ logger = logging.getLogger(__name__)
 log_format = ('[%(asctime)s] %(levelname)-6s %(message)s')
 
 logging.basicConfig(
-   #  level=logging.DEBUG,
-    level=logging.INFO,
+    level=logging.DEBUG,
+   #  level=logging.INFO,
     format=log_format,
     # filename=('debug.log'),
 )
 
-mode_pattern1 = {'mode': WORKOUT_MODE_E, 'id': 22, 'step': 2, 'tiebreaker': 0}
-mode_patterns = [mode_pattern1]
-params_pattern1 = {'level': LEVEL_MAX, 'speed': SPEED_MIN, 'height': HEIGHT_MAX, 'delay': DELAY_MOD_MIN, \
-   "wServes":2,"reduceRun":0,"ptDelay":1,"grunts":0}
-params_pattern2 = {'level': LEVEL_MIN, 'speed': SPEED_MAX, 'height': HEIGHT_MIN, 'delay': DELAY_MAX, \
-   "wServes":1,"reduceRun":1,"ptDelay":-2,"grunts":1}
-params_patterns = [params_pattern1, params_pattern2]
+mode_test_patterns= []
+mode_test_patterns.append({f'{MODE_PARAM}': base_mode_e.WORKOUT.value, f'{ID_PARAM}': 22, f'{STEP_PARAM}': 2})
+mode_test_patterns.append({f'{MODE_PARAM}': base_mode_e.GAME.value, f'{ID_PARAM}': 100, f'{STEP_PARAM}': 1})
+
+base_cfg_test_patterns= []
+base_cfg_test_patterns.append({f'{LEVEL_PARAM}': LEVEL_MAX, f'{GRUNTS_PARAM}': 0, f'{TRASHT_PARAM}': 1})
+base_cfg_test_patterns.append({f'{LEVEL_PARAM}': 30, f'{GRUNTS_PARAM}': 1, f'{TRASHT_PARAM}': 0})
+
+game_cfg_test_patterns= []
+game_cfg_test_patterns.append({f'{SERVE_MODE_PARAM}': serve_mode_e.BOOMER_ALL_SERVES.value, \
+   f'{POINTS_DELAY_PARAM}': 1.5, f'{TIEBREAKER_PARAM}': 1})
+
+drill_cfg_test_patterns= []
+drill_cfg_test_patterns.append({f'{SPEED_MOD_PARAM}': SPEED_MOD_MAX, \
+   f'{ELEVATION_MOD_PARAM}': ELEVATION_ANGLE_MOD_MIN, f'{DELAY_MOD_PARAM}': DELAY_MOD_MAX})
+drill_cfg_test_patterns.append({f'{SPEED_MOD_PARAM}': SPEED_MOD_MIN, \
+   f'{ELEVATION_MOD_PARAM}': ELEVATION_ANGLE_MOD_MAX, f'{DELAY_MOD_PARAM}': DELAY_MOD_MIN})
 
 def run_tests():
-   print("Mode test result: {}".format(test_register(MODE_RSRC, mode_patterns)))
-   print("Params test result: {}".format(test_register(OPTS_RSRC, params_patterns)))
-   print("Drill test result: {}".format(test_drill(drill_id=39)))
+   # print("Mode test result: {}".format(test_register(MODE_RSRC, mode_test_patterns)))
+   # print("base config test result: {}".format(test_register(BCFG_RSRC, base_cfg_test_patterns)))
+   # print("game config test result: {}".format(test_register(GCFG_RSRC, game_cfg_test_patterns)))
+   print("drill config test result: {}".format(test_register(DCFG_RSRC, drill_cfg_test_patterns)))
+   # print("Drill test result: {}".format(test_drill(drill_id=39)))
    # print("Game test result: {}".format(test_game(tie_breaker=True)))
-   # print("Game test result: {}".format(test_game(tie_breaker=False)))
-
 
 def test_game(tie_breaker=False):
    # sets mode, params; starts game; stops game

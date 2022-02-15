@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
   in_defines_region = False
   out_file = open(OUTPUT_FILE, 'w')
-  define_files = ['ipc_control.h', 'global_parameters.h', 'common_code/fault.h']
+  define_files = ['ipc_control.h', 'global_parameters.h', 'drill.h', 'common_code/fault.h']
   # define_files = ['common_code/fault.h']
   # define_files = ['drill_file.h']
   out_file.write("\nfrom enum import Enum\n")

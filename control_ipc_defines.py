@@ -20,22 +20,16 @@ GCFG_RSRC = "GCFG" #config params that apply to games:
 SCOR_RSRC = "SCOR" #player scores
 IPCS_RSRC = "IPCS" #game IPC statistics
 FLTS_RSRC = "FLTS" #list of faults
-GENERATE_ENUM(ENUM) = ENUM,
-GENERATE_STRING(STRING) = #STRING,
 class base_mode_e(Enum):
   BASE_MODE_NONE = 0
   GAME = 1
   DRILL = 2
   WORKOUT = 3
-  enum BASE_MODE_ENUM { = 4
-  GENERATE_ENUM = 5
 class base_state_e(Enum):
   BASE_STATE_NONE = 0
   IDLE = 1
   ACTIVE = 2
   PAUSED = 3
-  enum BASE_STATE_ENUM { = 4
-  GENERATE_ENUM = 5
 STATUS_PARAM = "status"
 SOFT_FAULT_PARAM = "sFault"
 HARD_FAULT_PARAM = "hFault"
@@ -55,8 +49,6 @@ class serve_mode_e(Enum):
   ALTERNATE_SERVES = 0
   PLAYER_ALL_SERVES = 1
   BOOMER_ALL_SERVES = 2
-GENERATE_ENUM(ENUM) = ENUM,
-GENERATE_STRING(STRING) = #STRING,
 FLT_CODE_PARAM = "fltCode"
 FLT_LOCATION_PARAM = "fltLoc"
 FLT_TIMESTAMP_PARAM = "fltTime"
@@ -99,6 +91,30 @@ LEVEL_DEFAULT = 25
 LEVEL_STEP = 5 #Dave wants to be to change this at a finer scale than presented to a user
 LEVEL_UI_STEP = 5
 LEVEL_UI_FACTOR = 10 #the UI would divide the min/max/default & ui_step by this number to present to the user
+
+# defines from file: drill.h
+SPEED_BALL_MIN = 20
+SPEED_BALL_MAX = 80
+SPEED_MOD_MIN = 80
+SPEED_MOD_MAX = 120
+SPEED_MOD_DEFAULT = 100
+SPEED_MOD_STEP = 2
+ELEVATION_ANGLE_MOD_MIN = -32
+ELEVATION_ANGLE_MOD_MAX = 32
+ELEVATION_ANGLE_MOD_DEFAULT = 0
+ELEVATION_ANGLE_MOD_STEP = 2
+ELEVATION_ANGLE_BALL_MIN = 1.0
+ELEVATION_ANGLE_BALL_MAX = 45.0
+DELAY_MOD_MIN = -2000
+DELAY_MOD_MAX = 2000
+DELAY_MOD_DEFAULT = 0
+DELAY_MOD_STEP = 100
+DELAY_UI_STEP = 100
+DELAY_UI_FACTOR = 1000
+DELAY_BALL_MIN = 0.75
+DELAY_BALL_MAX = 30
+SPIN_BALL_MIN = -3000
+SPIN_BALL_MAX = 3000
 
 # defines from file: common_code/fault.h
 class fault_e(Enum):

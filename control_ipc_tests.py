@@ -4,7 +4,7 @@ from ctrl_messaging_routines import send_msg, is_active
 from control_ipc_defines import GET_METHOD, PUT_METHOD, \
    MODE_RSRC, STAT_RSRC, STRT_RSRC, STOP_RSRC, OPTS_RSRC
 from control_ipc_defines import GAME_MODE_E,DRILL_MODE_E,WORKOUT_MODE_E
-from control_ipc_defines import LEVEL_MIN, SPEED_MIN, DELAY_MIN, HEIGHT_MIN
+from control_ipc_defines import LEVEL_MIN, SPEED_MIN, DELAY_MOD_MIN, HEIGHT_MIN
 from control_ipc_defines import LEVEL_MAX, SPEED_MAX, DELAY_MAX, HEIGHT_MAX
 import logging
 import sys
@@ -22,7 +22,7 @@ logging.basicConfig(
 
 mode_pattern1 = {'mode': WORKOUT_MODE_E, 'id': 22, 'step': 2, 'tiebreaker': 0}
 mode_patterns = [mode_pattern1]
-params_pattern1 = {'level': LEVEL_MAX, 'speed': SPEED_MIN, 'height': HEIGHT_MAX, 'delay': DELAY_MIN, \
+params_pattern1 = {'level': LEVEL_MAX, 'speed': SPEED_MIN, 'height': HEIGHT_MAX, 'delay': DELAY_MOD_MIN, \
    "wServes":2,"reduceRun":0,"ptDelay":1,"grunts":0}
 params_pattern2 = {'level': LEVEL_MIN, 'speed': SPEED_MAX, 'height': HEIGHT_MIN, 'delay': DELAY_MAX, \
    "wServes":1,"reduceRun":1,"ptDelay":-2,"grunts":1}

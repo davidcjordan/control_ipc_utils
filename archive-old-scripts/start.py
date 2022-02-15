@@ -10,10 +10,10 @@ Does the following:
 """
 from ctrl_messaging_routines import send_msg, is_active
 from control_ipc_defines import PUT_METHOD, STRT_RSRC, MODE_RSRC, OPTS_RSRC, \
-   LEVEL_MIN, LEVEL_MAX, LEVEL_DEFAULT, \
-   DELAY_MIN, DELAY_MAX, DELAY_DEFAULT, \
-   SPEED_MIN, SPEED_MAX, SPEED_DEFAULT, \
-   HEIGHT_MIN, HEIGHT_MAX, HEIGHT_DEFAULT, \
+   LEVEL_MOD_MIN, LEVEL_MOD_MAX, LEVEL_MOD_DEFAULT, \
+   DELAY_MOD_MOD_MIN, DELAY_MOD_MOD_MAX, DELAY_MOD_DEFAULT, \
+   SPEED_MOD_MIN, SPEED_MOD_MAX, SPEED_MOD_DEFAULT, \
+   HEIGHT_MOD_MIN, HEIGHT_MOD_MAX, HEIGHT_MOD_DEFAULT, \
    MODE_PARAM, ID_PARAM, STEP_PARAM, TIEBREAKER_PARAM, \
    LEVEL_PARAM, SPEED_PARAM, DELAY_PARAM, HEIGHT_PARAM 
 
@@ -29,24 +29,24 @@ if __name__ == '__main__':
          type=int, choices=range(1, 4), default=1, nargs='?', \
          )
    parser.add_argument('-l', '--level', dest='level_setting', \
-         type=int, default=LEVEL_DEFAULT, nargs='?', \
+         type=int, default=LEVEL_MOD_DEFAULT, nargs='?', \
          help='player skill level; range 10 to 70')
-         # choices=range(LEVEL_MIN, LEVEL_MAX+1), <- removed because it enumerated the range
+         # choices=range(LEVEL_MOD_MIN, LEVEL_MOD_MAX+1), <- removed because it enumerated the range
    parser.add_argument('-t', '--tiebreaker', dest='tiebreaker_setting', \
          type=int, choices=range(0, 2), default=0, nargs='?', \
          help='defaults to game mode')
    parser.add_argument('-s', '--speed', dest='speed_setting', \
-         type=int, default=SPEED_DEFAULT, nargs='?', \
+         type=int, default=SPEED_MOD_DEFAULT, nargs='?', \
          help='percent to increase/decrease ball speed: 80 to 100')
-         # choices=range(SPEED_MIN, SPEED_MAX+1),
+         # choices=range(SPEED_MOD_MIN, SPEED_MOD_MAX+1),
    parser.add_argument('-H', '--height', dest='height_setting', \
-         type=int, default=HEIGHT_DEFAULT, nargs='?', \
+         type=int, default=HEIGHT_MOD_DEFAULT, nargs='?', \
          help='number of 1/2 degrees to change height of the ball throw; range -32 to 32')
-         #choices=range(HEIGHT_MIN, HEIGHT_MAX+1),
+         #choices=range(HEIGHT_MOD_MIN, HEIGHT_MOD_MAX+1),
    parser.add_argument('-d', '--delay', dest='delay_setting', \
-         type=int, default=DELAY_DEFAULT, nargs='?', \
+         type=int, default=DELAY_MOD_DEFAULT, nargs='?', \
          help='milliseoncds of delay the next ball; range -2000 to 2000')
-         # choices=range(DELAY_MIN, DELAY_MAX+1), 
+         # choices=range(DELAY_MOD_MIN, DELAY_MOD_MAX+1), 
    parser.add_argument('-n', '--drill_id', dest='drill_id_setting', \
          type=int,  default=0, nargs='?', \
          help='drill number; range 0-999')
@@ -57,20 +57,20 @@ if __name__ == '__main__':
    #     args.level_setting, args.doubles_setting, args.tiebreaker_setting))
 
 
-   if args.speed_setting < SPEED_MIN or args.speed_setting > SPEED_MAX:
-      print("speed not between {} and {}".format(SPEED_MIN, SPEED_MAX))
+   if args.speed_setting < SPEED_MOD_MIN or args.speed_setting > SPEED_MOD_MAX:
+      print("speed not between {} and {}".format(SPEED_MOD_MIN, SPEED_MOD_MAX))
       sys.exit(1)
-   if args.height_setting < HEIGHT_MIN or args.height_setting > HEIGHT_MAX:
-      print("height not between {} and {}".format(HEIGHT_MIN, HEIGHT_MAX))
+   if args.height_setting < HEIGHT_MOD_MIN or args.height_setting > HEIGHT_MOD_MAX:
+      print("height not between {} and {}".format(HEIGHT_MOD_MIN, HEIGHT_MOD_MAX))
       sys.exit(1)
-   if args.delay_setting < DELAY_MIN or args.delay_setting > DELAY_MAX:
-      print("delay not between {} and {}".format(DELAY_MIN, DELAY_MAX))
+   if args.delay_setting < DELAY_MOD_MOD_MIN or args.delay_setting > DELAY_MOD_MAX:
+      print("delay not between {} and {}".format(DELAY_MOD_MOD_MIN, DELAY_MOD_MAX))
       sys.exit(1)
    if args.drill_id_setting < 0 or args.drill_id_setting > 999:
       print("drill_id not between 0 and 999")
       sys.exit(1)
-   if args.level_setting < LEVEL_MIN or args.level_setting > LEVEL_MAX:
-      print("level not between {} and {}".format(LEVEL_MIN, LEVEL_MAX))
+   if args.level_setting < LEVEL_MOD_MIN or args.level_setting > LEVEL_MOD_MAX:
+      print("level not between {} and {}".format(LEVEL_MOD_MIN, LEVEL_MOD_MAX))
       sys.exit(1)
 
    active = is_active()

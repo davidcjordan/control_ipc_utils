@@ -81,7 +81,7 @@ BASE_NAME = "Base"
 CTRL_NAME = "Ctrl"
 UI_NAME = "Ui"
 
-# defines from file: global_parameters.h
+# defines from file: level_setting.h
 SAME_LEVEL_AS_BOOMER = 11
 EASIER_LEVEL_THAN_BOOMER = 12
 HARDER_LEVEL_THAN_BOOMER = 13

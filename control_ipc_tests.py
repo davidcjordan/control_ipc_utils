@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 log_format = ('[%(asctime)s] %(levelname)-6s %(message)s')
 
 logging.basicConfig(
-    level=logging.DEBUG,
-   #  level=logging.INFO,
+   #  level=logging.DEBUG,
+    level=logging.INFO,
     format=log_format,
     # filename=('debug.log'),
 )
@@ -40,9 +40,9 @@ drill_cfg_test_patterns.append({f'{SPEED_MOD_PARAM}': SPEED_MOD_MIN, \
    f'{ELEVATION_MOD_PARAM}': ELEVATION_ANGLE_MOD_MAX, f'{DELAY_MOD_PARAM}': DELAY_MOD_MIN})
 
 def run_tests():
-   # print("Mode test result: {}".format(test_register(MODE_RSRC, mode_test_patterns)))
-   # print("base config test result: {}".format(test_register(BCFG_RSRC, base_cfg_test_patterns)))
-   # print("game config test result: {}".format(test_register(GCFG_RSRC, game_cfg_test_patterns)))
+   print("Mode test result: {}".format(test_register(MODE_RSRC, mode_test_patterns)))
+   print("base config test result: {}".format(test_register(BCFG_RSRC, base_cfg_test_patterns)))
+   print("game config test result: {}".format(test_register(GCFG_RSRC, game_cfg_test_patterns)))
    print("drill config test result: {}".format(test_register(DCFG_RSRC, drill_cfg_test_patterns)))
    # print("Drill test result: {}".format(test_drill(drill_id=39)))
    # print("Game test result: {}".format(test_game(tie_breaker=True)))

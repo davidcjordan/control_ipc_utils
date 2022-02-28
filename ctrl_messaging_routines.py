@@ -9,7 +9,7 @@ import logging
 import time
 import json
 
-from control_ipc_defines import RSRC_OFFSET, GET_METHOD, PUT_METHOD, RSP_METHOD, STAT_RSRC, \
+from control_ipc_defines import RSRC_OFFSET, GET_METHOD, PUT_METHOD, RSP_METHOD, STAT_RSRC, base_state_e, \
    RESP_OK, MAX_MESSAGE_SIZE, HEADER_LENGTH, BASE_NAME, CTRL_NAME, UI_NAME, CTRL_TRANSPRT, UI_TRANSPRT
 
 _RESP_CODE_START = RSRC_OFFSET + 1
@@ -169,13 +169,13 @@ def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}, channel=CTRL_TR
 
 
 def is_active():
-   msg_ok, status = send_msg()
+   msg_ok, status_msg = send_msg()
    if not msg_ok:
       print("Error getting status")
       return "error"
    else:
-      # print("Status: {}".format(status))
-      if (status is not None) and ('active' in status) and (status['active'] == 1):
+      print("Status: {}".format(status_msg))
+      if (status_msg is not None) and ('status' in status_msg) and (status_msg['status'] == base_state_e.PAUSED.value):
          return True
       else:
          return False

@@ -15,13 +15,13 @@ logging.basicConfig(format=log_format, level=logging.INFO)
 
 if __name__ == '__main__':
    from ctrl_messaging_routines import send_msg, is_active
-   from control_ipc_defines import PUT_METHOD, STRT_RSRC, MODE_RSRC, OPTS_RSRC, \
+   from control_ipc_defines import PUT_METHOD, STRT_RSRC, MODE_RSRC, BCFG_RSRC, DCFG_RSRC, \
+      MODE_PARAM, ID_PARAM, STEP_PARAM, base_mode_e, \
+      LEVEL_PARAM, SPEED_MOD_PARAM, DELAY_MOD_PARAM, ELEVATION_MOD_PARAM, \
       LEVEL_MIN, LEVEL_MAX, LEVEL_DEFAULT, \
       DELAY_MOD_MIN, DELAY_MOD_MAX, DELAY_MOD_DEFAULT, \
       SPEED_MOD_MIN, SPEED_MOD_MAX, SPEED_MOD_DEFAULT, \
-      HEIGHT_MOD_MIN, HEIGHT_MOD_MAX, HEIGHT_MOD_DEFAULT, \
-      MODE_PARAM, ID_PARAM, STEP_PARAM, DRILL_MODE_E, \
-      LEVEL_PARAM, SPEED_PARAM, DELAY_PARAM, HEIGHT_PARAM 
+      ELEVATION_ANGLE_MOD_MIN, ELEVATION_ANGLE_MOD_MAX, ELEVATION_ANGLE_MOD_DEFAULT
    import sys
 
    shell_rc = 1
@@ -37,7 +37,7 @@ if __name__ == '__main__':
          help='percent to increase/decrease ball speed: 80 to 100')
          # choices=range(SPEED_MOD_MIN, SPEED_MOD_MAX+1),
    parser.add_argument('-H', '--height', dest='height_setting', \
-         type=int, default=HEIGHT_MOD_DEFAULT, nargs='?', \
+         type=int, default=ELEVATION_ANGLE_MOD_DEFAULT, nargs='?', \
          help='number of 1/2 degrees to change height of the ball throw; range -32 to 32')
          #choices=range(HEIGHT_MOD_MIN, HEIGHT_MOD_MAX+1),
    parser.add_argument('-d', '--delay', dest='delay_setting', \
@@ -56,7 +56,7 @@ if __name__ == '__main__':
    if args.speed_setting < SPEED_MOD_MIN or args.speed_setting > SPEED_MOD_MAX:
       print("speed not between {} and {}".format(SPEED_MOD_MIN, SPEED_MOD_MAX))
       sys.exit(shell_rc)
-   if args.height_setting < HEIGHT_MOD_MIN or args.height_setting > HEIGHT_MOD_MAX:
+   if args.height_setting < ELEVATION_ANGLE_MOD_MIN or args.height_setting > ELEVATION_ANGLE_MOD_MAX:
       print("height not between {} and {}".format(HEIGHT_MOD_MIN, HEIGHT_MOD_MAX))
       sys.exit(shell_rc)
    if args.delay_setting < DELAY_MOD_MIN or args.delay_setting > DELAY_MOD_MAX:
@@ -78,20 +78,27 @@ if __name__ == '__main__':
       sys.exit(shell_rc)
 
 
-   mode = {MODE_PARAM: DRILL_MODE_E, \
+   mode = {MODE_PARAM: base_mode_e.DRILL.value, \
       ID_PARAM: args.drill_id_setting}
    rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
    if not rc:
       logging.error("PUT Mode failed, code: {}".format(code))
       sys.exit(shell_rc)
 
-   params = {LEVEL_PARAM: args.level_setting, \
-         SPEED_PARAM: args.speed_setting, \
-         HEIGHT_PARAM: args.height_setting, \
-         DELAY_PARAM: args.delay_setting}
-   rc, code = send_msg(PUT_METHOD, OPTS_RSRC, params)
+   # TODO: add grunts and trash talking
+   base_cfg_options = {LEVEL_PARAM: args.level_setting}
+   rc, code = send_msg(PUT_METHOD, BCFG_RSRC, base_cfg_options)
    if not rc:
-      logging.error("PUT PARAMS failed, code: {}".format(code))
+      logging.error("PUT Base Confg failed, code: {}".format(code))
+      sys.exit(shell_rc)
+
+
+   drill_cfg_mods = {SPEED_MOD_PARAM: args.speed_setting, \
+         ELEVATION_MOD_PARAM: args.height_setting, \
+         DELAY_MOD_PARAM: args.delay_setting}
+   rc, code = send_msg(PUT_METHOD, DCFG_RSRC, drill_cfg_mods)
+   if not rc:
+      logging.error("PUT Drill Config failed, code: {}".format(code))
       sys.exit(shell_rc)
 
    # start and check for active

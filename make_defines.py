@@ -24,7 +24,7 @@ if __name__ == '__main__':
   # OUTPUT_FILE = "drill_file_defines.py"
 
   parser = argparse.ArgumentParser(description='convert C defines to python')
-  parser.add_argument('-p', '--path', dest='h_file_dir', type=str, default="../../launcher/", nargs='?', \
+  parser.add_argument('-p', '--path', dest='h_file_dir', type=str, default="../launcher/", nargs='?', \
         help='path to directory with h files')
   args = parser.parse_args()
   # print("called with {}: ".format(sys.argv[0]))
@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
   in_defines_region = False
   out_file = open(OUTPUT_FILE, 'w')
-  define_files = ['ipc_control.h', 'global_parameters.h', 'drill.h', 'common_code/fault.h']
+  define_files = ['ipc_control.h', 'level_setting.h', 'drill.h', 'common_code/fault.h']
   # define_files = ['common_code/fault.h']
   # define_files = ['drill_file.h']
   out_file.write("\nfrom enum import Enum\n")

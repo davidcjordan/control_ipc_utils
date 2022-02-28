@@ -10,7 +10,7 @@ logging.basicConfig(format=log_format, level=logging.INFO)
 
 if __name__ == '__main__':
    from ctrl_messaging_routines import send_msg, is_active
-   from control_ipc_defines import PUT_METHOD, STOP_RSRC, PAUS_RSRC, RESU_RSRC, UI_TRANSPRT
+   from control_ipc_defines import PUT_METHOD, STOP_RSRC, PAUS_RSRC, UI_TRANSPRT
    import sys
 
    # print("argv[0]: {}".format(sys.argv[0]))
@@ -19,8 +19,8 @@ if __name__ == '__main__':
       resource = STOP_RSRC
    elif "pause" in sys.argv[0]:
       resource = PAUS_RSRC
-   elif "resume" in sys.argv[0]:
-      resource = RESU_RSRC
+   # elif "resume" in sys.argv[0]:
+   #    resource = RESU_RSRC
    else:
       print("command not recognized: %s", sys.argv[0])
       sys.exit(1)

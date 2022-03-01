@@ -168,14 +168,17 @@ def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}, channel=CTRL_TR
       return rc, msg
 
 
-def is_active():
+def is_state(state=base_state_e.ACTIVE.value):
    msg_ok, status_msg = send_msg()
    if not msg_ok:
-      print("Error getting status")
-      return "error"
+      # print("Error getting status")
+      return "error", None
    else:
-      print("Status: {}".format(status_msg))
-      if (status_msg is not None) and ('status' in status_msg) and (status_msg['status'] == base_state_e.PAUSED.value):
-         return True
-      else:
-         return False
+      # print("Status: {}".format(status_msg))
+      is_state = False
+      state_name = None
+      if (status_msg is not None) and ('status' in status_msg):
+         # state = status_msg['status']
+         state_name = base_state_e(status_msg['status']).name
+         is_state = (status_msg['status'] == state)
+      return is_state, state_name

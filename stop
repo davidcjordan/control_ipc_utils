@@ -9,8 +9,8 @@ logging.basicConfig(format=log_format, level=logging.INFO)
 
 
 if __name__ == '__main__':
-   from ctrl_messaging_routines import send_msg, is_active
-   from control_ipc_defines import PUT_METHOD, STOP_RSRC, PAUS_RSRC, UI_TRANSPRT
+   from ctrl_messaging_routines import send_msg, is_state
+   from control_ipc_defines import PUT_METHOD, STOP_RSRC, PAUS_RSRC, UI_TRANSPRT, base_state_e
    import sys
 
    # print("argv[0]: {}".format(sys.argv[0]))
@@ -32,12 +32,12 @@ if __name__ == '__main__':
       sys.exit(1)
 
    if resource is STOP_RSRC:
-      active = is_active()
-      if (type(active) is not bool):
+      idle, state = is_state(state=base_state_e.IDLE.value)
+      if (type(idle) is not bool):
          logging.error("GET Status failed")
          sys.exit(1)
-      if active:
-         logging.error("Base didn't go INactive after stop command")
-         sys.exit(1)
+      if idle:
+         logging.info(f"Boomer state is '{state}")
       else:
-         logging.info("Boomer is now stopped (inactive)")
+         logging.error(f"Base isn't idle after stop command: state is '{state}'")
+         sys.exit(1)

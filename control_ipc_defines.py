@@ -30,6 +30,9 @@ class base_state_e(Enum):
   IDLE = 1
   ACTIVE = 2
   PAUSED = 3
+  FAULTED = 4
+  OUTOFBALLS = 5
+
 STATUS_PARAM = "status"
 SOFT_FAULT_PARAM = "sFault"
 HARD_FAULT_PARAM = "hFault"

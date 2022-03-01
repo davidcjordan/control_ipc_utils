@@ -14,9 +14,9 @@ logging.basicConfig(format=log_format, level=logging.INFO)
 # logging.basicConfig(format=log_format, level=logging.DEBUG)
 
 if __name__ == '__main__':
-   from ctrl_messaging_routines import send_msg, is_active
+   from ctrl_messaging_routines import send_msg, is_state
    from control_ipc_defines import PUT_METHOD, STRT_RSRC, MODE_RSRC, BCFG_RSRC, DCFG_RSRC, \
-      MODE_PARAM, ID_PARAM, STEP_PARAM, base_mode_e, \
+      MODE_PARAM, ID_PARAM, STEP_PARAM, base_mode_e, base_state_e,\
       LEVEL_PARAM, SPEED_MOD_PARAM, DELAY_MOD_PARAM, ELEVATION_MOD_PARAM, \
       LEVEL_MIN, LEVEL_MAX, LEVEL_DEFAULT, \
       DELAY_MOD_MIN, DELAY_MOD_MAX, DELAY_MOD_DEFAULT, \
@@ -69,14 +69,13 @@ if __name__ == '__main__':
       print("level not between {} and {}".format(LEVEL_MIN, LEVEL_MAX))
       sys.exit(shell_rc)
 
-   active = is_active()
-   if (type(active) is not bool):
+   idle, state = is_state(state=base_state_e.IDLE.value)
+   if (type(idle) is not bool):
       logging.error("GET Status failed")
       sys.exit(shell_rc)
-   if active:
-      logging.error("Base already active")
+   if not idle:
+      logging.error(f"Base is not IDLE; state is '{state}'")
       sys.exit(shell_rc)
-
 
    mode = {MODE_PARAM: base_mode_e.DRILL.value, \
       ID_PARAM: args.drill_id_setting}
@@ -106,12 +105,12 @@ if __name__ == '__main__':
    if not rc:
       logging.error("PUT START failed, code: {}".format(code))
       sys.exit(shell_rc)
-   active = is_active()
-   if (type(active) is not bool):
+   paused, state = is_paused(state=base_mode_e.PAUSED.value)
+   if (type(paused) is not bool):
       logging.error("GET Status failed")
       sys.exit(shell_rc)
-   if not active:
-      logging.error("Base didn't go active after start command")
+   if not paused:
+      logging.error(f"Base didn't go pause after start drill; state is '{state}'")
       sys.exit(shell_rc)
    else:
       logging.info("Drill {} started; level={}, speed={}, height={}, delay={}".format(\

@@ -100,9 +100,14 @@ def empty_pipe():
    while not pipe_empty:
       fd_r, _, _ = _select([_fd_read], [], [], 0)
       if _fd_read in fd_r:
-         print("read pipe before sending msg: {}".format(
-            _os.read(_fd_read, MAX_MESSAGE_SIZE)))
+         try:
+            _os.read(_fd_read, MAX_MESSAGE_SIZE)
+         except:
+            break
+         # logging.debug(f"read pipe before sending msg: {_os.read(_fd_read, MAX_MESSAGE_SIZE)}\n")
          _non_empty_pipe_count += 1
+         if (_non_empty_pipe_count > 4):
+            break
       else:
          pipe_empty = True
 
@@ -123,10 +128,13 @@ def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}, channel=CTRL_TR
       send_encoded_msg = dict_to_bytes(settings)
 
    # print("header type: {} -- msg type: {}".format(type(header_bytes), type(send_encoded_msg)))
-   bytes_written = _os.write(_fd_write, header_bytes + send_encoded_msg)
+   try:
+      bytes_written = _os.write(_fd_write, header_bytes + send_encoded_msg)
+   except:
+      return rc, msg
 
    if bytes_written < 1:
-      logging.debug("FIFO write failed; read end closed?")
+      logging.warning("FIFO write failed; read end closed?")
    else:
       logging.debug("Wrote {} {}".format(header_bytes, send_encoded_msg))
 
@@ -177,8 +185,8 @@ def is_state(state=base_state_e.ACTIVE.value):
       # print("Status: {}".format(status_msg))
       is_state = False
       state_name = None
-      if (status_msg is not None) and ('status' in status_msg):
+      if (status_msg is not None) and (STATUS_PARAM in status_msg):
          # state = status_msg['status']
-         state_name = base_state_e(status_msg['status']).name
-         is_state = (status_msg['status'] == state)
+         state_name = base_state_e(status_msg[STATUS_PARAM]).name
+         is_state = (status_msg[STATUS_PARAM] == state)
       return is_state, state_name

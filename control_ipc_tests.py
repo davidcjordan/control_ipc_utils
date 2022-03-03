@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from ctrl_messaging_routines import send_msg, is_active
+from ctrl_messaging_routines import send_msg, is_state
 # from control_ipc_defines import GET_METHOD, PUT_METHOD, \
 #    MODE_RSRC, STAT_RSRC, STRT_RSRC, STOP_RSRC, BCFG_RSRC, DCFG_RSRC, GCFG_RSRC
 # from control_ipc_defines import base_mode_e

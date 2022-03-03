@@ -105,7 +105,7 @@ if __name__ == '__main__':
    if not rc:
       logging.error("PUT START failed, code: {}".format(code))
       sys.exit(shell_rc)
-   paused, state = is_paused(state=base_mode_e.PAUSED.value)
+   paused, state = is_state(state=base_mode_e.PAUSED.value)
    if (type(paused) is not bool):
       logging.error("GET Status failed")
       sys.exit(shell_rc)

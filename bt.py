@@ -18,7 +18,7 @@ logging.basicConfig(
 from ctrl_messaging_routines import send_msg, is_state
 from control_ipc_defines import *
 
-def start_boomer(mode, id=0):
+def start_boomer(mode=base_mode_e.GAME.value, id=0):
    rc, code = send_msg(PUT_METHOD, STOP_RSRC)
    mode_reg = {MODE_PARAM: mode, ID_PARAM: id}
    rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode_reg)

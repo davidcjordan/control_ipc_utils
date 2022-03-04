@@ -82,6 +82,8 @@ def main(main_screen):
          entry = my_window.getstr().decode(encoding="utf-8")
          curses.noecho()
          start_boomer(mode=base_mode_e.WORKOUT.value, id=entry)
+      if c == ord('t'): 
+         rc, code = send_msg(PUT_METHOD, PAUS_RSRC)
       if c == ord('e'): 
          rc, code = send_msg(PUT_METHOD, STOP_RSRC)
  

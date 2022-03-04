@@ -32,10 +32,18 @@ def main(main_screen):
    while True:
       mode = ''
       drill_worko_id = ''
-      toss_it, state = is_state()
-      if (state is None):
+      msg_ok, status_msg = send_msg()
+      if not msg_ok:
          state = 'Not_Running'
       else:
+         state = 'Error'
+         fault_count = 0
+         if (status_msg is not None):
+            if (STATUS_PARAM in status_msg):
+               state = base_state_e(status_msg[STATUS_PARAM]).name
+            if (HARD_FAULT_PARAM in status_msg):
+               fault_count = int(status_msg[HARD_FAULT_PARAM])
+
          msg_ok, mode_reg = send_msg(GET_METHOD, MODE_RSRC)
          if not msg_ok:
             logging.error(f"GET Mode register failed.")
@@ -48,7 +56,8 @@ def main(main_screen):
       my_window.clear() #clears warning from ctrl_messaging_routines
       my_window.addstr(0, 0, state)
       my_window.addstr(0, 14, f"{mode} {str(drill_worko_id)}")
-      my_window.addstr(0, 30, f"Faults: {refresh_count}")
+      if (fault_count > 0):
+         my_window.addstr(0, 30, f"Faults: {fault_count}")
       my_window.addstr(1, 0, "Command (d,g,w,t,e,q,?): ")
       my_window.refresh()
       my_window.timeout(2000) #millisec

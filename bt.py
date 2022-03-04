@@ -15,28 +15,14 @@ logging.basicConfig(
     # filename=('debug.log'),
 )
 
-
 from ctrl_messaging_routines import send_msg, is_state
 from control_ipc_defines import *
 
-def game_start():
+def start_boomer(mode, id=0):
    rc, code = send_msg(PUT_METHOD, STOP_RSRC)
-   mode_reg = {MODE_PARAM: base_mode_e.GAME.value}
+   mode_reg = {MODE_PARAM: mode, ID_PARAM: id}
    rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode_reg)
    rc, code = send_msg(PUT_METHOD, STRT_RSRC)
-
-def drill_start(drill_id):
-   rc, code = send_msg(PUT_METHOD, STOP_RSRC)
-   mode_reg = {MODE_PARAM: base_mode_e.DRILL.value, ID_PARAM: drill_id}
-   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode_reg)
-   rc, code = send_msg(PUT_METHOD, STRT_RSRC)
-
-def workout_start(workout_id):
-   rc, code = send_msg(PUT_METHOD, STOP_RSRC)
-   mode_reg = {MODE_PARAM: base_mode_e.WOKROUT.value, ID_PARAM: workout_id}
-   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode_reg)
-   rc, code = send_msg(PUT_METHOD, STRT_RSRC)
-
 
 def main(main_screen):
    screen = curses.initscr()
@@ -76,7 +62,7 @@ def main(main_screen):
          my_window.refresh()
          curses.napms(3000)
       if c == ord('g'): 
-         game_start()
+         start_boomer()
       if c == ord('d'): 
          # window.clrtoeol()
          my_window.clear()
@@ -86,7 +72,7 @@ def main(main_screen):
          my_window.timeout(-1)
          entry = my_window.getstr().decode(encoding="utf-8")
          curses.noecho()
-         drill_start(entry)
+         start_boomer(mode=base_mode_e.DRILL.value, id=entry)
       if c == ord('w'): 
          my_window.clear()
          my_window.addstr(1, 0, "Enter workout number: ")
@@ -95,7 +81,9 @@ def main(main_screen):
          my_window.timeout(-1)
          entry = my_window.getstr().decode(encoding="utf-8")
          curses.noecho()
-         workout_start(entry)
+         start_boomer(mode=base_mode_e.WORKOUT.value, id=entry)
+      if c == ord('e'): 
+         rc, code = send_msg(PUT_METHOD, STOP_RSRC)
  
    curses.endwin()
    # raise Exception

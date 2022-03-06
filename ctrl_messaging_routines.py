@@ -62,7 +62,7 @@ def init(channel=CTRL_TRANSPRT):
    # except Exception as err:
    #    exception_type = type(err).__name__
    #    print("Unable to open write: " + exception_type)
-      logging.warning("can not connect to boomer_base.")
+      # logging.warning("can not connect to boomer_base.")
       return False
    
    logging.debug("{} opened.".format(write_fifo))

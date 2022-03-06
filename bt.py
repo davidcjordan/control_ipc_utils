@@ -25,19 +25,22 @@ def start_boomer(mode=base_mode_e.GAME.value, id=0):
    rc, code = send_msg(PUT_METHOD, STRT_RSRC)
 
 def main(main_screen):
+   not_up = "Not_running"
    screen = curses.initscr()
    # lines, columns, start line, start column
    my_window = curses.newwin(3, 48, 0, 0)
    refresh_count = 1
    while True:
+      # init variables to something, for when they are accessed below
       mode = ''
       drill_worko_id = ''
+      state = 'Error'
+      fault_count = 0
+      #get/parse status
       msg_ok, status_msg = send_msg()
       if not msg_ok:
-         state = 'Not_Running'
+         state = not_up
       else:
-         state = 'Error'
-         fault_count = 0
          if (status_msg is not None):
             if (STATUS_PARAM in status_msg):
                state = base_state_e(status_msg[STATUS_PARAM]).name
@@ -58,7 +61,11 @@ def main(main_screen):
       my_window.addstr(0, 14, f"{mode} {str(drill_worko_id)}")
       if (fault_count > 0):
          my_window.addstr(0, 30, f"Faults: {fault_count}")
-      my_window.addstr(1, 0, "Command (d,g,w,t,e,q,?): ")
+      if state == not_up:
+         my_window.addstr(1, 0, "Waiting for the base to be active...")
+         my_window.addstr(2, 0, "  Type q to quit:")
+      else:
+         my_window.addstr(1, 0, "Command (d,g,w,t,e,q,?): ")
       my_window.refresh()
       my_window.timeout(2000) #millisec
       c = my_window.getch()

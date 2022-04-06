@@ -2,7 +2,7 @@
 from enum import Enum
 
 # defines from file: ipc_control.h
-MAX_MESSAGE_SIZE = 252
+MAX_MESSAGE_SIZE = 254
 RSRC_STRING_LENGTH = 4
 RSRC_OFFSET = 4
 HEADER_LENGTH = 8
@@ -32,7 +32,6 @@ class base_state_e(Enum):
   PAUSED = 3
   FAULTED = 4
   OUTOFBALLS = 5
-
 STATUS_PARAM = "status"
 SOFT_FAULT_PARAM = "sFault"
 HARD_FAULT_PARAM = "hFault"
@@ -47,6 +46,7 @@ DELAY_MOD_PARAM = "delay"
 ELEVATION_MOD_PARAM = "eleva"
 POINTS_DELAY_PARAM = "ptDelay" #increase/decrease time between points in seconds
 TIEBREAKER_PARAM = "tiebreaker"
+RUN_REDUCE_PARAM = "reduceRun" #reduce running - not in initial release
 SERVE_MODE_PARAM = "wServes" #server for game: No Serves, All Serves, Alternative Serves
 class serve_mode_e(Enum):
   ALTERNATE_SERVES = 0
@@ -83,6 +83,20 @@ UI_TRANSPRT = 1
 BASE_NAME = "Base"
 CTRL_NAME = "Ctrl"
 UI_NAME = "Ui"
+class throw_type_e(Enum):
+  SERVE = 0
+  DROP = 1
+  FLAT = 2
+  LOOP = 3
+  CHIP = 4
+  LOB = 5
+  TOP = 6
+  PASS = 7
+class special_throw_type_e(Enum):
+  NONE = 0
+  CUSTOM = 1
+  RAND_GROUND = 2
+  RAND_NET = 3
 
 # defines from file: level_setting.h
 SAME_LEVEL_AS_BOOMER = 11
@@ -107,7 +121,7 @@ ELEVATION_ANGLE_MOD_MAX = 32
 ELEVATION_ANGLE_MOD_DEFAULT = 0
 ELEVATION_ANGLE_MOD_STEP = 2
 ELEVATION_ANGLE_BALL_MIN = 1.0
-ELEVATION_ANGLE_BALL_MAX = 45.0
+ELEVATION_ANGLE_BALL_MAX = 46.0
 DELAY_MOD_MIN = -2000
 DELAY_MOD_MAX = 2000
 DELAY_MOD_DEFAULT = 0
@@ -145,7 +159,12 @@ class fault_e(Enum):
   ADC_EXCESSIVE_READ_ERRORS = 21
   TACH_ERROR_ON_INITIALIZATION = 22
   TACH_EXCESSIVE_READ_ERRORS = 23
-  FAULT_END = 24
+  BALL_SWITCH_STUCK_DOWN = 24
+  BOTTOM_WHEEL_FAILED_TO_REACH_SPEED = 25
+  TOP_WHEEL_FAILED_TO_REACH_SPEED = 26
+  LEFT_RIGHT_FAILED_TO_REACH_TARGET = 27
+  UP_DOWN_SERVO_FAILED_TO_REACH_TARGET = 28
+  FAULT_END = 29
 class net_device_e(Enum):
   LEFT = 0
   RIGHT = 1

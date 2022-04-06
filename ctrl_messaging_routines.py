@@ -59,10 +59,11 @@ def init(channel=CTRL_TRANSPRT):
    try:
       _fd_write = _os.open(write_fifo, _os.O_WRONLY | _os.O_NONBLOCK)
    except:
+   # the following is commented out to not have log warnings when the base is not running
    # except Exception as err:
    #    exception_type = type(err).__name__
    #    print("Unable to open write: " + exception_type)
-      # logging.warning("can not connect to boomer_base.")
+   #    logging.warning("can not connect to boomer_base.")
       return False
    
    logging.debug("{} opened.".format(write_fifo))
@@ -112,7 +113,7 @@ def empty_pipe():
          pipe_empty = True
 
 
-def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}, channel=CTRL_TRANSPRT):
+def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}, channel=UI_TRANSPRT):
    global _fd_read
    global _fd_write
    if not init(channel):
@@ -177,7 +178,7 @@ def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}, channel=CTRL_TR
 
 
 def is_state(state=base_state_e.ACTIVE.value):
-   msg_ok, status_msg = send_msg()
+   msg_ok, status_msg = send_msg(channel=CTRL_TRANSPRT)
    if not msg_ok:
       # print("Error getting status")
       return "error", None

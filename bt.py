@@ -19,10 +19,10 @@ from ctrl_messaging_routines import send_msg, is_state
 from control_ipc_defines import *
 
 def start_boomer(mode=base_mode_e.GAME.value, id=0):
-   rc, code = send_msg(PUT_METHOD, STOP_RSRC)
+   rc, code = send_msg(PUT_METHOD, STOP_RSRC, channel=CTRL_TRANSPRT)
    mode_reg = {MODE_PARAM: mode, ID_PARAM: id}
-   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode_reg)
-   rc, code = send_msg(PUT_METHOD, STRT_RSRC)
+   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode_reg, channel=CTRL_TRANSPRT)
+   rc, code = send_msg(PUT_METHOD, STRT_RSRC, channel=CTRL_TRANSPRT)
 
 def main(main_screen):
    not_up = "Not_running"
@@ -37,7 +37,7 @@ def main(main_screen):
       state = 'Error'
       fault_count = 0
       #get/parse status
-      msg_ok, status_msg = send_msg()
+      msg_ok, status_msg = send_msg(channel=CTRL_TRANSPRT)
       if not msg_ok:
          state = not_up
       else:
@@ -47,7 +47,7 @@ def main(main_screen):
             if (HARD_FAULT_PARAM in status_msg):
                fault_count = int(status_msg[HARD_FAULT_PARAM])
 
-         msg_ok, mode_reg = send_msg(GET_METHOD, MODE_RSRC)
+         msg_ok, mode_reg = send_msg(GET_METHOD, MODE_RSRC, channel=CTRL_TRANSPRT)
          if not msg_ok:
             logging.error(f"GET Mode register failed.")
          else:
@@ -99,9 +99,9 @@ def main(main_screen):
          curses.noecho()
          start_boomer(mode=base_mode_e.WORKOUT.value, id=entry)
       if c == ord('t'): 
-         rc, code = send_msg(PUT_METHOD, PAUS_RSRC)
+         rc, code = send_msg(PUT_METHOD, PAUS_RSRC, channel=CTRL_TRANSPRT)
       if c == ord('e'): 
-         rc, code = send_msg(PUT_METHOD, STOP_RSRC)
+         rc, code = send_msg(PUT_METHOD, STOP_RSRC, channel=CTRL_TRANSPRT)
  
    curses.endwin()
    # raise Exception

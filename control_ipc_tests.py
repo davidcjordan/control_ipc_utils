@@ -59,14 +59,14 @@ def test_game(tie_breaker=False):
 
    int_tiebreaker = int(tie_breaker == True)
 
-   mode = {'mode': GAME_MODE_E, 'tie_breaker': int_tiebreaker}
-   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
+   mode = {'mode': GAME_MODE_E}
+   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode, channel=CTRL_TRANSPRT)
    if not rc:
       logging.error("test_game: initial PUT mode failed, code: {}".format(code))
       return False
 
    # start and check for active
-   rc, code = send_msg(PUT_METHOD, STRT_RSRC)
+   rc, code = send_msg(PUT_METHOD, STRT_RSRC, channel=CTRL_TRANSPRT)
    if not rc:
       logging.error("test_game: PUT START failed, code: {}".format(code))
       return False
@@ -78,7 +78,7 @@ def test_game(tie_breaker=False):
       test_rc = False
 
    # stop and check for inactive
-   rc, code = send_msg(PUT_METHOD, STOP_RSRC)
+   rc, code = send_msg(PUT_METHOD, STOP_RSRC,channel=CTRL_TRANSPRT)
    if not rc:
       logging.error("test_game: PUT STOP failed, code: {}".format(code))
       return False
@@ -90,7 +90,7 @@ def test_game(tie_breaker=False):
       test_rc = False
 
    # check mode for doubles, tieb_break
-   rc, register = send_msg(GET_METHOD, MODE_RSRC)
+   rc, register = send_msg(GET_METHOD, MODE_RSRC, channel=CTRL_TRANSPRT)
    if not rc:
       logging.error("test_game: final GET mode failed")
       return False
@@ -115,13 +115,13 @@ def test_drill(drill_id=39):
       return False
 
    mode = {'mode': DRILL_MODE_E, 'id': drill_id}
-   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode)
+   rc, code = send_msg(PUT_METHOD, MODE_RSRC, mode, channel=CTRL_TRANSPRT)
    if not rc:
       logging.error("test_drill: initial PUT mode failed, code: {}".format(code))
       return False
 
    # start and check for active
-   rc, code = send_msg(PUT_METHOD, STRT_RSRC)
+   rc, code = send_msg(PUT_METHOD, STRT_RSRC, channel=CTRL_TRANSPRT)
    if not rc:
       logging.error("test_drill: PUT START failed, code: {}".format(code))
       return False
@@ -133,7 +133,7 @@ def test_drill(drill_id=39):
       test_rc = False
 
    # stop and check for inactive
-   rc, code = send_msg(PUT_METHOD, STOP_RSRC)
+   rc, code = send_msg(PUT_METHOD, STOP_RSRC, channel=CTRL_TRANSPRT)
    if not rc:
       logging.error("test drill: PUT STOP failed, code: {}".format(code))
       return False
@@ -150,7 +150,7 @@ def test_drill(drill_id=39):
 def test_register(register_under_test, patterns):
    test_pattern = {}
    read_back_compare = True
-   msg_ok, register_original = send_msg(GET_METHOD, register_under_test)
+   msg_ok, register_original = send_msg(GET_METHOD, register_under_test, channel=CTRL_TRANSPRT)
    if not msg_ok:
       logging.error("GET {} failed.".format(register_under_test))
       return False
@@ -160,11 +160,11 @@ def test_register(register_under_test, patterns):
 
    for pattern in patterns:
       logging.debug(f"Setting {register_under_test} to: {pattern}")
-      if send_msg(PUT_METHOD, register_under_test, pattern) == False:
+      if send_msg(PUT_METHOD, register_under_test, pattern, channel=CTRL_TRANSPRT) == False:
          logging.error(f"PUT {register_under_test} failed")
          read_back_compare = False
          break
-      msg_ok, reg_read_back = send_msg(GET_METHOD, register_under_test)
+      msg_ok, reg_read_back = send_msg(GET_METHOD, register_under_test, channel=CTRL_TRANSPRT)
       if not msg_ok:
          logging.error(f"GET {register_under_test} failed.")
          read_back_compare = False
@@ -178,7 +178,7 @@ def test_register(register_under_test, patterns):
          break
 
    #restore 
-   if (send_msg(PUT_METHOD, register_under_test, register_original) == False):
+   if (send_msg(PUT_METHOD, register_under_test, register_original, channel=CTRL_TRANSPRT) == False):
       logging.error(f"restore {register_under_test} failed")
    logging.info(f"Register test done: {register_under_test} restored to: {register_original}")
    return(read_back_compare)

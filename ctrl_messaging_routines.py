@@ -129,6 +129,7 @@ def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}, channel=UI_TRAN
       send_encoded_msg = dict_to_bytes(settings)
 
    # print("header type: {} -- msg type: {}".format(type(header_bytes), type(send_encoded_msg)))
+   logging.debug(f"sending: {header_bytes} {send_encoded_msg}")
    try:
       bytes_written = _os.write(_fd_write, header_bytes + send_encoded_msg)
    except:
@@ -161,6 +162,7 @@ def send_msg(method=GET_METHOD, resource=STAT_RSRC, settings={}, channel=UI_TRAN
    if len(data) == 0:
       logging.debug("FIFO read failed; write end closed?")
    else:
+      # print(f"Read: {data[0:HEADER_LENGTH]}{data[HEADER_LENGTH:]}")
       logging.debug(f"Read: {data[0:HEADER_LENGTH]}{data[HEADER_LENGTH:]}")
       code = data[_RESP_CODE_START:HEADER_LENGTH]
       if data.startswith(_OK):

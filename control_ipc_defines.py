@@ -24,7 +24,8 @@ class base_mode_e(Enum):
   BASE_MODE_NONE = 0
   GAME = 1
   DRILL = 2
-  WORKOUT = 3
+  BEEP = 3
+  WORKOUT = 4
 class base_state_e(Enum):
   BASE_STATE_NONE = 0
   IDLE = 1
@@ -83,20 +84,6 @@ UI_TRANSPRT = 1
 BASE_NAME = "Base"
 CTRL_NAME = "Ctrl"
 UI_NAME = "Ui"
-class throw_type_e(Enum):
-  SERVE = 0
-  DROP = 1
-  FLAT = 2
-  LOOP = 3
-  CHIP = 4
-  LOB = 5
-  TOP = 6
-  PASS = 7
-class special_throw_type_e(Enum):
-  NONE = 0
-  CUSTOM = 1
-  RAND_GROUND = 2
-  RAND_NET = 3
 
 # defines from file: level_setting.h
 SAME_LEVEL_AS_BOOMER = 11
@@ -108,6 +95,48 @@ LEVEL_DEFAULT = 25
 LEVEL_STEP = 5 #Dave wants to be to change this at a finer scale than presented to a user
 LEVEL_UI_STEP = 5
 LEVEL_UI_FACTOR = 10 #the UI would divide the min/max/default & ui_step by this number to present to the user
+
+# defines from file: calc_ball.h
+class balltype_e(Enum):
+  NONE = 0
+  SERVE = 1
+  DROP = 2
+  FLAT = 3
+  LOOP = 4
+  CHIP = 5
+  LOB = 6
+  TOPSPIN = 7
+  PASS = 8
+  CUSTOM = 9
+  RAND_GROUND = 10
+  RAND_NET = 11
+  REPEAT = 12
+  END = 13
+ROTARY_CALIB_NAME = "ROTARY"
+ROTARY_CALIB_TYPE = 10
+ELEVATOR_CALIB_NAME = "ELEVATOR"
+ELEVATOR_CALIB_TYPE = (ROTARY_CALIB_TYPE + 1)
+class ball_servo_param_e(Enum):
+  ELEV = 0
+  SPEED = 1
+  SPIN = 2
+ROTTYPE_F4 = 0
+ROTTYPE_F3 = 1
+ROTTYPE_F2 = 2
+ROTTYPE_F1 = 3
+ROTTYPE_CENTER = 4
+ROTTYPE_B1 = 5
+ROTTYPE_B2 = 6
+ROTTYPE_B3 = 7
+ROTTYPE_B4 = 8
+ROTTYPE_RAND = 9
+ROTTYPE_F5 = 10
+ROTTYPE_B5 = 11
+ROTTYPE_RANDFH = 12
+ROTTYPE_RANDBH = 13
+ROTTYPE_R2 = 14
+ROTTYPE_R3 = 15
+ROTTYPE_INV = 16
 
 # defines from file: drill.h
 SPEED_BALL_MIN = 20
@@ -132,6 +161,17 @@ DELAY_BALL_MIN = 0.75
 DELAY_BALL_MAX = 30
 SPIN_BALL_MIN = -3000
 SPIN_BALL_MAX = 3000
+
+# defines from file: drill_load.h
+DRILL_FILES_PATH = "/home/pi/boomer/drills/"
+NAME_LINE = 1
+DESC_LINE = 2
+AUDIO_LINE = 3
+COLUMN_TITLES_LINE = 4
+BEEP_DRILL_NUMBER_START = 900
+BEEP_DRILL_NUMBER_END = 949
+THROWER_CALIB_DRILL_NUMBER_START = 780
+CALIB_MODE_STRING = "!calibration: "
 
 # defines from file: common_code/fault.h
 class fault_e(Enum):

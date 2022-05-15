@@ -20,6 +20,7 @@ GCFG_RSRC = "GCFG" #config params that apply to games:
 SCOR_RSRC = "SCOR" #player scores
 IPCS_RSRC = "IPCS" #game IPC statistics
 FLTS_RSRC = "FLTS" #list of faults
+FUNC_RSRC = "FUNC" #used to call functions, like creep
 class base_mode_e(Enum):
   BASE_MODE_NONE = 0
   GAME = 1
@@ -72,6 +73,9 @@ IPC_0_NUM_BAD_PARAM = "0_bad"
 IPC_1_NUM_READS_PARAM = "1_rd"
 IPC_1_NUM_WRITES_PARAM = "1_wr"
 IPC_1_NUM_BAD_PARAM = "1_bad"
+FUNC_CREEP = "creep"
+FUNC_RESTART = "restart"
+FUNC_DUMP = "dump"
 RESP_OK = 200
 BAD_REQUEST = 400 #used if the message decode fails
 FORBIDDEN = 403

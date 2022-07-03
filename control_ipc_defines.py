@@ -73,9 +73,11 @@ IPC_0_NUM_BAD_PARAM = "0_bad"
 IPC_1_NUM_READS_PARAM = "1_rd"
 IPC_1_NUM_WRITES_PARAM = "1_wr"
 IPC_1_NUM_BAD_PARAM = "1_bad"
-FUNC_CREEP = "creep"
-FUNC_RESTART = "restart"
-FUNC_DUMP = "dump"
+FUNC_CREEP = "creep" #creep is the key, the value can be Elevator or Rotory
+FUNC_RESTART = "restart" #value can be either c for cams or a for base+cams
+FUNC_DUMP = "dump" #currently no values are checked
+FUNC_GEN_CORRECTION_VECTORS = "gen_cv" #value is ignored
+FUNC_TRACKING = "tracking" #value is either begin or end
 RESP_OK = 200
 BAD_REQUEST = 400 #used if the message decode fails
 FORBIDDEN = 403
@@ -211,7 +213,8 @@ class fault_e(Enum):
   CONTROL_PROGRAM_NOT_RUNNING = 29
   CONTROL_PROGRAM_GET_STATUS_FAILED = 30
   CONTROL_PROGRAM_FAILED = 31
-  FAULT_END = 32
+  NOT_TRACKING_BALL = 32
+  FAULT_END = 33
 class net_device_e(Enum):
   LEFT = 0
   RIGHT = 1

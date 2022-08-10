@@ -97,7 +97,7 @@ EASIER_LEVEL_THAN_BOOMER = 12
 HARDER_LEVEL_THAN_BOOMER = 13
 LEVEL_MIN = 20
 LEVEL_MAX = 70
-LEVEL_DEFAULT = 25
+LEVEL_DEFAULT = 35
 LEVEL_STEP = 5 #Dave wants to be to change this at a finer scale than presented to a user
 LEVEL_UI_STEP = 5
 LEVEL_UI_FACTOR = 10 #the UI would divide the min/max/default & ui_step by this number to present to the user
@@ -214,10 +214,13 @@ class fault_e(Enum):
   CONTROL_PROGRAM_GET_STATUS_FAILED = 30
   CONTROL_PROGRAM_FAILED = 31
   NOT_TRACKING_BALL = 32
-  FAULT_END = 33
+  READ_CAMERA_CONFIG_FILE_ERROR = 33
+  CAMERA_VECTOR_GENERATION_FAILED = 34
+  FAULT_END = 35
 class net_device_e(Enum):
   LEFT = 0
   RIGHT = 1
   SPEAKER = 2
   BASE = 3
-  UNRECOGNIZED_DEVICE = 4
+  TRACKING = 4
+  UNRECOGNIZED_DEVICE = 5

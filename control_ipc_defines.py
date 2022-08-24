@@ -27,13 +27,15 @@ class base_mode_e(Enum):
   DRILL = 2
   BEEP = 3
   WORKOUT = 4
+  CREEP_CALIBRATION = 5
 class base_state_e(Enum):
   BASE_STATE_NONE = 0
   IDLE = 1
   ACTIVE = 2
   PAUSED = 3
   FAULTED = 4
-  OUTOFBALLS = 5
+  TRACKING_FAULTED = 5
+  OUTOFBALLS = 6
 STATUS_PARAM = "status"
 SOFT_FAULT_PARAM = "sFault"
 HARD_FAULT_PARAM = "hFault"
@@ -216,7 +218,8 @@ class fault_e(Enum):
   NOT_TRACKING_BALL = 32
   READ_CAMERA_CONFIG_FILE_ERROR = 33
   CAMERA_VECTOR_GENERATION_FAILED = 34
-  FAULT_END = 35
+  SETTING_CAMERA_EXPOSURE_FAILED = 35
+  FAULT_END = 36
 class net_device_e(Enum):
   LEFT = 0
   RIGHT = 1

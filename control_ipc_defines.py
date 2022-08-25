@@ -34,8 +34,10 @@ class base_state_e(Enum):
   ACTIVE = 2
   PAUSED = 3
   FAULTED = 4
-  TRACKING_FAULTED = 5
-  OUTOFBALLS = 6
+  OUTOFBALLS = 5
+class soft_fault_e(Enum):
+  SOFT_FAULT_NONE = 0
+  SOFT_FAULT_TRACKING = 1
 STATUS_PARAM = "status"
 SOFT_FAULT_PARAM = "sFault"
 HARD_FAULT_PARAM = "hFault"

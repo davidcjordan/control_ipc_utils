@@ -65,7 +65,7 @@ def main(main_screen):
          my_window.addstr(1, 0, "Waiting for the base to be active...")
          my_window.addstr(2, 0, "  Type q to quit:")
       else:
-         my_window.addstr(1, 0, "Command (d,g,w,t,e,q,?): ")
+         my_window.addstr(1, 0, "Command (d,g,w,t,e,f,q,?): ")
       my_window.refresh()
       my_window.timeout(2000) #millisec
       c = my_window.getch()
@@ -74,7 +74,7 @@ def main(main_screen):
          break
       if c == ord('?'):
          my_window.addstr(1, 0, "d=drill, g=game, w=workout, t=toggle_pause")
-         my_window.addstr(2, 8, "e=end game/drill/wo, q=quit")
+         my_window.addstr(2, 8, "e=end game/drill/wo, f=function, q=quit")
          my_window.refresh()
          curses.napms(3000)
       if c == ord('g'): 
@@ -102,6 +102,30 @@ def main(main_screen):
          rc, code = send_msg(PUT_METHOD, PAUS_RSRC, channel=CTRL_TRANSPRT)
       if c == ord('e'): 
          rc, code = send_msg(PUT_METHOD, STOP_RSRC, channel=CTRL_TRANSPRT)
+      if c == ord('f'): 
+         # get type of function:
+         my_window.clear()
+         my_window.addstr(1, 0, "Enter d[ump], r[estart], s[aveLog]:")
+         my_window.refresh()
+         my_window.timeout(-1)
+         c = my_window.getch()
+         my_window.clear()
+
+         #get type to dump:
+         if c == ord('d'):
+            func_type = FUNC_DUMP
+            my_window.addstr(1, 0, "Enter f[ault], t[ach], c[am], e[xpos], n[etw]:")
+ 
+         #get type to restart:
+         elif c == ord('r'):
+            func_type = FUNC_RESTART
+            my_window.addstr(1, 0, "Enter c[ams], a[ll]:")
+
+         my_window.refresh()
+         my_window.timeout(-1)
+         c_str = my_window.getkey()
+         rc, code = send_msg(PUT_METHOD, FUNC_RSRC, settings={func_type:c_str}, channel=CTRL_TRANSPRT)
+
  
    curses.endwin()
    # raise Exception

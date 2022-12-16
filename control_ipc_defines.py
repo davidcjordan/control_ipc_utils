@@ -79,8 +79,8 @@ IPC_1_NUM_WRITES_PARAM = "1_wr"
 IPC_1_NUM_BAD_PARAM = "1_bad"
 FUNC_CREEP = "creep" #creep is the key, the value can be Elevator or Rotory
 FUNC_RESTART = "restart" #value can be either c for cams or a for base+cams
-FUNC_DUMP = "dump" #currently no values are checked
-FUNC_GEN_CORRECTION_VECTORS = "gen_cv" #value is ignored
+FUNC_DUMP = "dump" #values: c==cam stats; t==tach stats; n==net error stats
+FUNC_GEN_CORRECTION_VECTORS = "gen_cv" #value is 0 or 1 for cam number
 FUNC_TRACKING = "tracking" #value is either begin or end
 RESP_OK = 200
 BAD_REQUEST = 400 #used if the message decode fails
@@ -89,6 +89,7 @@ NOT_FOUND = 404 # unknown resource
 METHOD_NOT_ALLOWED = 405
 LOCKED = 423 # used for PUT mode if the boomer_base is Active
 UNPROCESSABLE_ENTITY = 422 #used for encode errors - there was not a great error response for this
+INTERNAL_SERVER_ERROR = 500 #used when the request fails (e.g. correction vector generation)
 CTRL_TRANSPRT = 0
 UI_TRANSPRT = 1
 BASE_NAME = "Base"
@@ -221,7 +222,8 @@ class fault_e(Enum):
   READ_CAMERA_CONFIG_FILE_ERROR = 33
   CAMERA_VECTOR_GENERATION_FAILED = 34
   SETTING_CAMERA_EXPOSURE_FAILED = 35
-  FAULT_END = 36
+  CAMERA_FOCAL_LENGTH_CALC_FAILED = 36
+  FAULT_END = 37
 class net_device_e(Enum):
   LEFT = 0
   RIGHT = 1

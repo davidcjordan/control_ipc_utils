@@ -20,14 +20,14 @@ GCFG_RSRC = "GCFG" #config params that apply to games:
 SCOR_RSRC = "SCOR" #player scores
 IPCS_RSRC = "IPCS" #game IPC statistics
 FLTS_RSRC = "FLTS" #list of faults
-FUNC_RSRC = "FUNC" #used to call functions, like creep
+FUNC_RSRC = "FUNC" #used to call functions, like calibration
 class base_mode_e(Enum):
   BASE_MODE_NONE = 0
   GAME = 1
   DRILL = 2
   BEEP = 3
   WORKOUT = 4
-  CREEP_CALIBRATION = 5
+  CALIBRATION = 5
 class base_state_e(Enum):
   BASE_STATE_NONE = 0
   IDLE = 1

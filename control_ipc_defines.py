@@ -50,6 +50,7 @@ GRUNTS_PARAM = "grunts"
 SPEED_MOD_PARAM = "speed"
 DELAY_MOD_PARAM = "delay"
 ELEVATION_MOD_PARAM = "eleva"
+CONTINUOUS_MOD_PARAM = "contin"
 POINTS_DELAY_PARAM = "ptDelay" #increase/decrease time between points in seconds
 TIEBREAKER_PARAM = "tiebreaker"
 RUN_REDUCE_PARAM = "reduceRun" #reduce running - not in initial release

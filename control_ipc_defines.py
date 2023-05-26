@@ -55,6 +55,7 @@ POINTS_DELAY_PARAM = "ptDelay" #increase/decrease time between points in seconds
 TIEBREAKER_PARAM = "tiebreaker"
 RUN_REDUCE_PARAM = "reduceRun" #reduce running - not in initial release
 SERVE_MODE_PARAM = "wServes" #server for game: No Serves, All Serves, Alternative Serves
+ADVANCED_GAME_PARAM = "advanced" #
 class serve_mode_e(Enum):
   ALTERNATE_SERVES = 0
   PLAYER_ALL_SERVES = 1
@@ -80,9 +81,10 @@ IPC_1_NUM_WRITES_PARAM = "1_wr"
 IPC_1_NUM_BAD_PARAM = "1_bad"
 FUNC_CALIB = "calib" #calib is the key, the value can be Elevator or Rotory or Wheels
 FUNC_RESTART = "restart" #value can be either c for cams or a for base+cams
-FUNC_DUMP = "dump" #values: c==cam stats; t==tach stats; n==net error stats
+FUNC_DUMP = "dump" #values: c==cam stats; t==tach stats; n==net error stats; f==faults
 FUNC_GEN_CORRECTION_VECTORS = "gen_cv" #value is 0 or 1 for cam number
 FUNC_TRACKING = "tracking" #value is either begin or end
+FUNC_HELP = "help" #values: g==game
 RESP_OK = 200
 BAD_REQUEST = 400 #used if the message decode fails
 FORBIDDEN = 403

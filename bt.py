@@ -114,7 +114,7 @@ def main(main_screen):
          #get type to dump:
          if c == ord('d'):
             func_type = FUNC_DUMP
-            my_window.addstr(1, 0, "Enter f[ault], t[ach], c[am], e[xpos], n[etw], s[ound]:")
+            my_window.addstr(1, 0, "Enter f[ault], t[ach], c[am], e[xpos], n[etw], s[ound], m[ods]:")
  
          #get type to restart:
          elif c == ord('r'):

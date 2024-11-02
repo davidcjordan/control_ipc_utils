@@ -264,3 +264,38 @@ class net_device_e(Enum):
   BASE = 3
   TRACKING = 4
   UNRECOGNIZED_DEVICE = 5
+
+# defines from file: drill_score.h
+class score_method_e(Enum):
+  NOT_SCORED = 0
+  GROUND = 1
+  VOLLEY = 2
+  OVERHEAD = 3
+  LOB = 4
+  DROP = 5
+  SERVE_DEUCE = 6
+  SERVE_AD = 7
+  SERVE_DEUCE_WIDE = 8
+  SERVE_DEUCE_T = 9
+  SERVE_AD_WIDE = 10
+  SERVE_AD_T = 11
+  DEUCE = 12
+  AD = 13
+  SHORT = 14
+  DEEP = 15
+  VERY_DEEP = 16
+  DEUCE_SHORT = 17
+  AD_SHORT = 18
+  DEUCE_DEEP = 19
+  AD_DEEP = 20
+  DEUCE_VERY_DEEP = 21
+  AD_VERY_DEEP = 22
+  DEUCE_THIRD = 23
+  CENTER_THIRD = 24
+  AD_THIRD = 25
+  OUT_OF_CENTER = 26
+  DEUCE_SHORT_VERY_WIDE = 27
+  AD_SHORT_VERY_WIDE = 28
+  DEUCE_DEEP_60 = 29
+  AD_DEEP_60 = 30
+  SCORE_METHOD_END = 31

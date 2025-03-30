@@ -21,6 +21,7 @@ SCOR_RSRC = "SCOR" #player scores
 IPCS_RSRC = "IPCS" #game IPC statistics
 FLTS_RSRC = "FLTS" #list of faults
 FUNC_RSRC = "FUNC" #used to call functions, like calibration
+SRVO_RSRC = "SRVO" #get/set servo parameters: center_fast, drop_speed, PASS_ANGLE, etc
 class base_mode_e(Enum):
   BASE_MODE_NONE = 0
   GAME = 1
@@ -85,6 +86,15 @@ FUNC_DUMP = "dump" #values: c==cam stats; t==tach stats; n==net error stats; f==
 FUNC_GEN_CORRECTION_VECTORS = "gen_cv" #value is 0 or 1 for cam number
 FUNC_TRACKING = "tracking" #value is either begin or end
 FUNC_HELP = "help" #values: g==game
+CENTER_ANGLE_PARAM = "center"
+SERVE_ANGLE_PARAM = "Serve_ang"
+FLAT_ANGLE_PARAM = "Flat_ang"
+LOOP_ANGLE_PARAM = "Loop_ang"
+CHIP_ANGLE_PARAM = "Chip_ang"
+TOPSPIN_ANGLE_PARAM = "Top_ang"
+PASS_ANGLE_PARAM = "Pass_ang"
+DROP_SPEED_PARAM = "drp_sp"
+LOB_SPEED_PARAM = "lob_sp"
 RESP_OK = 200
 BAD_REQUEST = 400 #used if the message decode fails
 FORBIDDEN = 403

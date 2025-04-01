@@ -18,11 +18,11 @@ if __name__ == '__main__':
 
    msg_ok, servo_params = send_msg(GET_METHOD, SRVO_RSRC, channel=CTRL_TRANSPRT)
    if not msg_ok:
-      print("Error getting servo parameters")
+      logging.error("Error getting servo parameters")
    else:
-      print(f"servo parameters: {servo_params}")
+      logging.info(f"servo parameters: {servo_params} type: {type(servo_params)}")
 
-   params = {CENTER_ANGLE_PARAM: 25, DROP_SPEED_PARAM: 284, LOB_SPEED_PARAM: 412}
+   params = {CENTER_ANGLE_PARAM: 25, DROP_SPEED_PARAM: 284, LOB_SPEED_PARAM: 412} # > 550 is out of range
    ang_params1 = {SERVE_ANGLE_PARAM: 219, FLAT_ANGLE_PARAM: 135, LOOP_ANGLE_PARAM: 145}
    ang_params2 = {CHIP_ANGLE_PARAM: 199, TOPSPIN_ANGLE_PARAM: 250, PASS_ANGLE_PARAM: 215}
    params.update(ang_params1)

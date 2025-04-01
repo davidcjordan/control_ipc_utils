@@ -180,6 +180,14 @@ class rotary_setting_e(Enum):
   ROTTYPE_B13 = 33
   ROTTYPE_END = 34
 
+# defines from file: servo_rot_elev.h
+ONE_POT_BIT_VOLT = 0.01953
+ELEV_CALIB_LOW = 20.0
+ELEV_CALIB_MED_LOW = 26.0
+ELEV_CALIB_MED = 32.0
+ELEV_CALIB_MED_HIGH = 38.0
+ELEV_CALIB_HIGH = 44.0
+
 # defines from file: drill.h
 SPEED_BALL_MIN = 20
 SPEED_BALL_MAX = 80

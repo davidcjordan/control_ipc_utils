@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
   in_defines_region = False
   out_file = open(OUTPUT_FILE, 'w')
-  define_files = ['ipc_control.h', 'level_setting.h', 'calc_ball.h', \
+  define_files = ['ipc_control.h', 'level_setting.h', 'calc_ball.h', 'servo_rot_elev.h', \
     'drill.h', 'drill_load.h', 'common_code/fault.h', 'drill_score.h']
   # define_files = ['common_code/fault.h']
   # define_files = ['drill_file.h']
